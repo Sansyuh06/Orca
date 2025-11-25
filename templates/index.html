@@ -6,6 +6,7 @@
     <title>Quantum Trading Platform | Real-Time Intelligence</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -182,6 +183,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .chart-title {
@@ -511,6 +514,44 @@
             animation: blink 1.4s infinite;
         }
 
+        .realtime-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            width: auto;
+        }
+
+        .realtime-toggle:hover {
+            background: var(--surface-elevated);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .realtime-toggle.active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .realtime-toggle.active svg {
+            animation: pulse-icon 2s infinite;
+        }
+
+        @keyframes pulse-icon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         /* Canvas Modal - FIXED */
         .canvas-modal {
             position: fixed;
@@ -544,7 +585,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    Quantum Trading
+                    ⚡ Quantum Trading
                 </div>
                 <div class="status-bar">
                     <div class="status-item">
@@ -579,7 +620,7 @@
                     
                     <div id="agent-btn-container" class="agent-btn-container hidden">
                         <button id="open-agent-btn" class="agent-btn">
-                            Open AI Canvas
+                            🎨 Open AI Canvas
                         </button>
                     </div>
                 </div>
@@ -604,7 +645,16 @@
 
                     <div id="analysis-content" class="hidden">
                         <div class="chart-header">
-                            <div class="chart-title" id="chart-title">Stock Chart</div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="chart-title" id="chart-title">Stock Chart</div>
+                                <button id="realtime-toggle-btn" class="realtime-toggle" style="display: none;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                        <polyline points="17 6 23 6 23 12"></polyline>
+                                    </svg>
+                                    <span id="realtime-toggle-text">Start Live Updates</span>
+                                </button>
+                            </div>
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <div class="price-ticker" id="price-ticker">
                                     <span id="current-price">$0.00</span>
@@ -621,7 +671,7 @@
 
                 <div id="forecast-panel" class="forecast-panel hidden">
                     <div class="forecast-header">
-                        <span class="forecast-title">Price Forecast</span>
+                        <span class="forecast-title">📊 ML Price Forecast</span>
                     </div>
                     <div class="forecast-direction" id="forecast-direction">-</div>
                     <div class="forecast-details" id="forecast-details">-</div>
