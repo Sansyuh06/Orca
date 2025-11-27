@@ -1,4 +1,8 @@
-"""FinSight-X ADK Integration - Wraps existing system in Google ADK architecture"""
+"""
+FinSight-X ADK Integration
+Wraps the existing system in Google's Agent Development Kit (ADK) architecture.
+This allows us to treat the whole app as a "Glass Box" agent.
+"""
 import os, time, json
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Any, Optional, Callable
@@ -19,10 +23,18 @@ class ADKTool:
     parameters: Dict[str, Any]
     function: Callable
     
-    def to_schema(self): return {"name": self.name, "description": self.description, "parameters": self.parameters}
+    def to_schema(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "parameters": self.parameters
+        }
+
     def execute(self, **kwargs):
         try:
-            return {"status": "success", "data": self.function(**kwargs), "tool": self.name}
+            # Execute the actual function
+            result = self.function(**kwargs)
+            return {"status": "success", "data": result, "tool": self.name}
         except Exception as e:
             return {"status": "error", "error": str(e), "tool": self.name}
 
@@ -38,7 +50,9 @@ class ADKTraceEvent:
     timestamp: float
     duration_ms: float = 0.0
     model: str = ""
-    def to_dict(self): return asdict(self)
+
+    def to_dict(self):
+        return asdict(self)
 
 class ADKObservability:
     def __init__(self):
@@ -49,8 +63,12 @@ class ADKObservability:
         self.trace.append(ADKTraceEvent(self.current_step, phase, component, name, status, inputs, outputs, time.time(), duration_ms, model))
         print(f"[ADK-{phase.upper()}] {component}/{name}: {status}")
     
-    def get_trace(self): return [e.to_dict() for e in self.trace]
-    def clear(self): self.trace, self.current_step = [], 0
+    def get_trace(self):
+        return [e.to_dict() for e in self.trace]
+
+    def clear(self):
+        self.trace = []
+        self.current_step = 0
 
 @dataclass
 class ADKMemory:
@@ -183,7 +201,9 @@ class ADKFlaskWrapper:
         self.app, self.stock_analyzer, self.llm_orchestrator = app, stock_analyzer, llm_orchestrator
         self.adk_agent = FinSightADKAgent(stock_analyzer, llm_orchestrator, os.environ.get('GOOGLE_API_KEY'))
         self._register_routes()
-        print("\n" + "="*60 + "\nADK INTEGRATED\n" + "="*60)
+        print("\n" + "="*60)
+        print("ADK INTEGRATED - GLASS BOX MODE ACTIVE")
+        print("="*60)
     
     def _register_routes(self):
         @self.app.route('/api/adk/analyze/<symbol>', methods=['GET', 'POST'])

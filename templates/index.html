@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- 
+  FinSight-X Frontend
+  The "Face" of the Agent.
+  Built with vanilla JS + Chart.js because React was overkill for this part.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -55,7 +60,7 @@
             padding: 16px 0;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 100; /* Keep this above the chart canvas! */
             backdrop-filter: blur(10px);
         }
 
@@ -606,7 +611,7 @@
 
     <div class="container">
         <div class="main">
-            <!-- Left Panel -->
+            <!-- Left Panel: Controls & AI Selection -->
             <div>
                 <div class="panel">
                     <div class="panel-header">Stock Analysis</div>
@@ -635,7 +640,7 @@
                 </div>
             </div>
 
-            <!-- Center Panel -->
+            <!-- Center Panel: The "Stage" for Charts & Data -->
             <div>
                 <div class="chart-container">
                     <div id="empty-state" class="empty-state">
@@ -725,7 +730,7 @@
                 </div>
             </div>
 
-            <!-- Right Panel -->
+            <!-- Right Panel: Insights & News -->
             <div>
                 <div class="panel">
                     <div class="panel-header">Recommendation</div>

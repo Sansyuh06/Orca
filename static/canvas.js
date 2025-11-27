@@ -1,5 +1,7 @@
 // ============================================================================
-// AI CANVAS - n8n Style Visual Workflow Builder
+// AI CANVAS - Visual Workflow Builder
+// Inspired by n8n/Flowise but simpler.
+// Note: This uses React via Babel Standalone for simplicity in this demo.
 // ============================================================================
 
 const { useState, useRef, useEffect } = React;
@@ -11,40 +13,40 @@ const MessageSquare = () => (
     )
 );
 
-const ArrowRight = ({size = 16}) => (
+const ArrowRight = ({ size = 16 }) => (
     React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
         React.createElement('line', { x1: 5, y1: 12, x2: 19, y2: 12 }),
         React.createElement('polyline', { points: '12 5 19 12 12 19' })
     )
 );
 
-const Trash2 = ({size = 16}) => (
+const Trash2 = ({ size = 16 }) => (
     React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
         React.createElement('polyline', { points: '3 6 5 6 21 6' }),
         React.createElement('path', { d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' })
     )
 );
 
-const Play = ({size = 16}) => (
+const Play = ({ size = 16 }) => (
     React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
         React.createElement('polygon', { points: '5 3 19 12 5 21 5 3' })
     )
 );
 
-const X = ({size = 16}) => (
+const X = ({ size = 16 }) => (
     React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
         React.createElement('line', { x1: 18, y1: 6, x2: 6, y2: 18 }),
         React.createElement('line', { x1: 6, y1: 6, x2: 18, y2: 18 })
     )
 );
 
-const Zap = ({size = 16}) => (
+const Zap = ({ size = 16 }) => (
     React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
         React.createElement('polygon', { points: '13 2 3 14 12 14 11 22 21 10 12 10 13 2' })
     )
 );
 
-const Bot = ({size = 16}) => (
+const Bot = ({ size = 16 }) => (
     React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
         React.createElement('rect', { x: 3, y: 11, width: 18, height: 10, rx: 2 }),
         React.createElement('circle', { cx: 12, cy: 5, r: 2 }),
@@ -90,11 +92,11 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
 
     const addNode = (type, config = {}) => {
         const existingOfType = nodes.filter(n => n.type === type);
-        
+
         if (type === 'chat' && existingOfType.length > 0) return;
         if (type === 'evaluator' && existingOfType.length > 0) return;
         if (type === 'quantum' && existingOfType.length > 0) return;
-        
+
         const newNode = {
             id: `${type}-${Date.now()}`,
             type: type,
@@ -103,7 +105,8 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
             status: 'idle',
             ...config
         };
-        
+
+        // TODO: Add collision detection so nodes don't overlap
         setNodes([...nodes, newNode]);
     };
 
@@ -126,31 +129,32 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const newX = Math.max(0, Math.min(rect.width - 240, e.clientX - rect.left - dragOffset.x));
         const newY = Math.max(0, Math.min(rect.height - 120, e.clientY - rect.top - dragOffset.y));
-        
-        setNodes(prevNodes => prevNodes.map(node => 
+
+        setNodes(prevNodes => prevNodes.map(node =>
             node.id === draggingNode ? { ...node, x: newX, y: newY } : node
         ));
     };
 
     const handleMouseUp = () => {
         setDraggingNode(null);
+        // Snap to grid? Maybe later.
     };
 
     const handlePortClick = (e, nodeId, isOutput) => {
         e.stopPropagation();
-        
+
         if (isOutput) {
             setConnectingFrom(nodeId);
         } else {
             if (connectingFrom && connectingFrom !== nodeId) {
                 const fromNode = nodes.find(n => n.id === connectingFrom);
                 const toNode = nodes.find(n => n.id === nodeId);
-                
-                const validConnection = 
+
+                const validConnection =
                     (fromNode.type === 'model' && toNode.type === 'chat') ||
                     (fromNode.type === 'chat' && (toNode.type === 'evaluator' || toNode.type === 'quantum')) ||
                     (fromNode.type === 'quantum' && toNode.type === 'chat');
-                
+
                 if (validConnection) {
                     const exists = connections.some(c => c.from === connectingFrom && c.to === nodeId);
                     if (!exists) {
@@ -174,48 +178,51 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
 
     const executeWorkflow = async () => {
         setIsExecuting(true);
-        
+
         const modelNodes = nodes.filter(n => n.type === 'model');
-        setNodes(nodes.map(node => 
+        setNodes(nodes.map(node =>
             node.type === 'model' ? { ...node, status: 'processing' } : node
         ));
-        
+
         await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        setNodes(nodes.map(node => 
+
+        setNodes(nodes.map(node =>
             node.type === 'model' ? { ...node, status: 'complete' } : node
         ));
-        
+
         const quantumNode = nodes.find(n => n.type === 'quantum');
         if (quantumNode && currentAnalysis) {
-            setNodes(nodes.map(node => 
+            setNodes(nodes.map(node =>
                 node.type === 'quantum' ? { ...node, status: 'processing' } : node
             ));
-            
+
             await new Promise(resolve => setTimeout(resolve, 1000));
-            
+
             const quantumMsg = {
                 id: Date.now(),
                 role: 'quantum',
                 content: `Quantum Analysis Results:\nTrade Success: ${currentAnalysis.metrics.quantum_trade_prob.toFixed(1)}%\nRisk Level: ${currentAnalysis.metrics.quantum_risk.toFixed(1)}%\nForecast: ${currentAnalysis.forecast.direction} ${currentAnalysis.forecast.expected_change}%\nConfidence: ${currentAnalysis.forecast.confidence}%`
             };
             setChatMessages(prev => [...prev, quantumMsg]);
-            
-            setNodes(nodes.map(node => 
+
+            setNodes(nodes.map(node =>
                 node.type === 'quantum' ? { ...node, status: 'complete' } : node
             ));
         }
-        
+
         setIsExecuting(false);
     };
 
+
+
+    // TODO: Clean up this massive function
     const sendMessage = () => {
         if (!inputMessage.trim()) return;
-        
+
         const userMsg = { id: Date.now(), role: 'user', content: inputMessage };
         setChatMessages([...chatMessages, userMsg]);
         setInputMessage('');
-        
+
         // Send question to backend LLM chat endpoint with connected models
         (async () => {
             try {
@@ -277,7 +284,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                     if (flagged) bestModel = flagged.model_id;
                 }
                 if (!bestModel) {
-                    const byScore = responsesArr.filter(r => typeof r.score === 'number').sort((a,b)=>b.score - a.score);
+                    const byScore = responsesArr.filter(r => typeof r.score === 'number').sort((a, b) => b.score - a.score);
                     if (byScore.length) bestModel = byScore[0].model_id;
                 }
                 if (!bestModel && responsesArr.length) bestModel = responsesArr[0].model_id;
@@ -335,11 +342,11 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
             evaluator: { label: 'DeepSeek-R1', color: '#ef4444', hasInput: true, hasOutput: false },
             quantum: { label: 'Quantum Predictor', color: '#8b5cf6', hasInput: true, hasOutput: true }
         };
-        
+
         const config = nodeConfig[node.type];
         const isSelected = selectedNode === node.id;
         const statusColor = node.status === 'processing' ? '#f59e0b' : node.status === 'complete' ? '#10b981' : '#64748b';
-        
+
         return (
             <div
                 key={node.id}
@@ -381,7 +388,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                 borderRadius: '50%',
                                 background: statusColor,
                                 boxShadow: `0 0 8px ${statusColor}`
-                            }}/>
+                            }} />
                             <span style={{ fontSize: '13px', fontWeight: '600', color: '#e2e8f0' }}>
                                 {config.label}
                             </span>
@@ -397,10 +404,10 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                 display: 'flex'
                             }}
                         >
-                            <Trash2 size={14}/>
+                            <Trash2 size={14} />
                         </button>
                     </div>
-                    
+
                     {/* Body */}
                     <div style={{ padding: '10px' }}>
                         <div style={{ fontSize: '10px', color: '#9ca3af', lineHeight: '1.5' }}>
@@ -420,7 +427,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             </div>
                         )}
                     </div>
-                    
+
                     {/* Ports */}
                     {config.hasOutput && (
                         <div
@@ -525,10 +532,10 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             display: 'flex'
                         }}
                     >
-                        <X size={20}/>
+                        <X size={20} />
                     </button>
                 </div>
-                
+
                 {/* Core Nodes */}
                 <div style={{ marginBottom: '24px' }}>
                     <h3 style={{
@@ -538,7 +545,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                         textTransform: 'uppercase',
                         marginBottom: '12px'
                     }}>Core Nodes</h3>
-                    
+
                     <button
                         onClick={() => addNode('chat', { label: 'Chat Interface' })}
                         style={{
@@ -562,7 +569,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                         </div>
                     </button>
                 </div>
-                
+
                 {/* AI Models */}
                 <div style={{ marginBottom: '24px' }}>
                     <h3 style={{
@@ -576,8 +583,8 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                     {models.map(model => (
                         <button
                             key={model.id}
-                            onClick={() => addNode('model', { 
-                                label: model.name, 
+                            onClick={() => addNode('model', {
+                                label: model.name,
                                 color: model.color,
                                 modelId: model.id
                             })}
@@ -615,7 +622,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                         </button>
                     ))}
                 </div>
-                
+
                 {/* Advanced */}
                 <div>
                     <h3 style={{
@@ -625,7 +632,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                         textTransform: 'uppercase',
                         marginBottom: '12px'
                     }}>Advanced</h3>
-                    
+
                     <button
                         onClick={() => addNode('evaluator', { label: 'DeepSeek-R1' })}
                         style={{
@@ -660,7 +667,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             <div style={{ fontSize: '11px', color: '#9ca3af' }}>Evaluator</div>
                         </div>
                     </button>
-                    
+
                     <button
                         onClick={() => addNode('quantum', { label: 'Quantum Predictor' })}
                         style={{
@@ -695,7 +702,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                         </div>
                     </button>
                 </div>
-                
+
                 {/* Info */}
                 <div style={{
                     marginTop: 'auto',
@@ -724,7 +731,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                     </ul>
                 </div>
             </div>
-            
+
             {/* Main Canvas */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {/* Toolbar */}
@@ -742,8 +749,8 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                         disabled={isExecuting || nodes.length === 0}
                         style={{
                             padding: '8px 14px',
-                            background: isExecuting || nodes.length === 0 
-                                ? '#2f3740' 
+                            background: isExecuting || nodes.length === 0
+                                ? '#2f3740'
                                 : 'linear-gradient(135deg, #3b82f6, #2563eb)',
                             border: 'none',
                             borderRadius: '8px',
@@ -756,14 +763,14 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             fontSize: '14px'
                         }}
                     >
-                        <Play size={14}/>
+                        <Play size={14} />
                         {isExecuting ? 'Executing...' : 'Execute Workflow'}
                     </button>
-                    
+
                     <div style={{ fontSize: '12px', color: '#9ca3af' }}>
                         {nodes.length} nodes • {connections.length} connections
                     </div>
-                    
+
                     {currentAnalysis && (
                         <div style={{
                             marginLeft: 'auto',
@@ -778,12 +785,12 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             alignItems: 'center',
                             gap: '8px'
                         }}>
-                            <Zap size={14}/>
+                            <Zap size={14} />
                             {currentAnalysis.symbol}: {currentAnalysis.recommendation}
                         </div>
                     )}
                 </div>
-                
+
                 {/* Canvas Area */}
                 <div
                     ref={canvasRef}
@@ -811,13 +818,13 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             const from = getNodePosition(conn.from);
                             const to = getNodePosition(conn.to);
                             if (!from || !to) return null;
-                            
+
                             const fromNode = nodes.find(n => n.id === conn.from);
                             const color = fromNode?.color || '#06b6d4';
-                            
+
                             const midX = (from.x + to.x) / 2;
                             const path = `M ${from.x} ${from.y} Q ${midX} ${from.y}, ${to.x} ${to.y}`;
-                            
+
                             return (
                                 <g key={conn.id}>
                                     <path
@@ -827,15 +834,15 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                         fill="none"
                                         opacity="0.6"
                                     />
-                                    <circle cx={to.x} cy={to.y} r="4" fill={color}/>
+                                    <circle cx={to.x} cy={to.y} r="4" fill={color} />
                                 </g>
                             );
                         })}
                     </svg>
-                    
+
                     {/* Nodes */}
                     {nodes.map(node => renderNode(node))}
-                    
+
                     {/* Connection Preview */}
                     {connectingFrom && (
                         <div style={{
@@ -845,9 +852,9 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             border: '2px dashed rgba(59, 130, 246, 0.3)',
                             borderRadius: '8px',
                             pointerEvents: 'none'
-                        }}/>
+                        }} />
                     )}
-                    
+
                     {/* Empty State */}
                     {nodes.length === 0 && (
                         <div style={{
@@ -871,7 +878,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                     )}
                 </div>
             </div>
-            
+
             {/* Chat Panel */}
             {selectedNode && selectedNode.startsWith('chat-') && (
                 <div style={{
@@ -938,7 +945,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                                 const percentile = (entry.score || 0) / 10;
                                                 let scoreColor = '#b0b0b0';
                                                 let barColor = '#3b82f6';
-                                                
+
                                                 if (isHighest && sortedScores.length > 1) {
                                                     scoreColor = '#4ade80';
                                                     barColor = '#4ade80';
@@ -952,7 +959,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                                     scoreColor = '#fbbf24';
                                                     barColor = '#fbbf24';
                                                 }
-                                                
+
                                                 return (
                                                     <div key={entry.id} onClick={() => showModelResponse(entry.id)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px', gap: '8px', cursor: 'pointer', opacity: isLowest && sortedScores.length > 1 ? 0.7 : 1 }}>
                                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -978,7 +985,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             )}
                         </div>
                     </div>
-                    
+
                     {/* Messages */}
                     <div style={{
                         flex: 1,
@@ -1003,20 +1010,20 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                 </p>
                             </div>
                         )}
-                        
+
                         {chatMessages.map(msg => (
                             <div
                                 key={msg.id}
                                 style={{
                                     padding: '12px',
                                     borderRadius: '12px',
-                                    background: msg.role === 'user' 
-                                        ? '#242424' 
-                                        : msg.role === 'quantum' 
-                                        ? '#242424' 
-                                        : msg.role === 'system'
+                                    background: msg.role === 'user'
                                         ? '#242424'
-                                        : '#1a1a1a',
+                                        : msg.role === 'quantum'
+                                            ? '#242424'
+                                            : msg.role === 'system'
+                                                ? '#242424'
+                                                : '#1a1a1a',
                                     border: '1px solid #333333'
                                 }}
                             >
@@ -1064,7 +1071,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                             </div>
                         ))}
                     </div>
-                    
+
                     {/* Input */}
                     <div style={{
                         padding: '16px',
@@ -1095,8 +1102,8 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                 disabled={!inputMessage.trim()}
                                 style={{
                                     padding: '12px 16px',
-                                    background: inputMessage.trim() 
-                                        ? 'linear-gradient(135deg, #10b981, #059669)' 
+                                    background: inputMessage.trim()
+                                        ? 'linear-gradient(135deg, #10b981, #059669)'
                                         : '#374151',
                                     border: 'none',
                                     borderRadius: '8px',
@@ -1107,7 +1114,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                     color: 'white'
                                 }}
                             >
-                                <ArrowRight size={16}/>
+                                <ArrowRight size={16} />
                             </button>
                         </div>
                     </div>
@@ -1118,17 +1125,17 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
 };
 
 // Global function to open canvas
-window.openCanvas = function() {
+window.openCanvas = function () {
     console.log('Opening AI Canvas...');
     const modal = document.getElementById('canvas-modal');
     if (!modal) {
         console.error('Canvas modal element not found');
         return;
     }
-    
+
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    
+
     const root = ReactDOM.createRoot(modal);
     root.render(
         React.createElement(QuantumTradingCanvas, {
@@ -1143,7 +1150,7 @@ window.openCanvas = function() {
             }
         })
     );
-    
+
     console.log('AI Canvas opened successfully');
 };
 

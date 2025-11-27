@@ -1,6 +1,7 @@
-"""
-Quantum Trading Platform - Ultra-Fixed Version with Multiple Data Sources
-"""
+# Quantum Trading Platform - Ultra-Fixed Version with Multiple Data Sources
+# Author: Sansyuh06
+# Last Updated: Nov 2025
+# Note: This is the main backend file. It handles data fetching, analysis, and LLM orchestration.
 
 from flask import Flask, render_template, jsonify, request
 import pandas as pd
@@ -48,6 +49,7 @@ class StockAnalyzer:
     
     def fetch_yahoo_finance_direct(self, symbol):
         """Direct Yahoo Finance API call (no yfinance)"""
+        # Note: This is an undocumented endpoint, might break. Keep an eye on it.
         try:
             logger.info(f"Trying direct Yahoo Finance API for {symbol}...")
             
@@ -194,6 +196,7 @@ class StockAnalyzer:
     
     def generate_synthetic_data(self, symbol):
         """Generate realistic synthetic data based on actual market patterns"""
+        # FIXME: This is a fallback for when APIs fail. Not ideal for production but keeps the demo running.
         logger.warning(f"Generating synthetic data for {symbol} (no real data available)")
         
         # Base prices for known stocks
@@ -287,6 +290,7 @@ class StockAnalyzer:
     
     def analyze(self, symbol):
         """Perform stock analysis with all fallbacks"""
+        # TODO: Refactor this massive function into smaller chunks. It's getting too big.
         try:
             logger.info(f"\n{'='*60}")
             logger.info(f"ANALYZING {symbol}")
@@ -544,6 +548,7 @@ class StockAnalyzer:
 class LLMOrchestrator:
     """Multi-LLM system"""
     
+    # Using Ollama for local inference. Make sure it's running!
     OLLAMA_URL = "http://localhost:11434/api/generate"
     
     GENERATOR_MODELS = {
@@ -562,6 +567,7 @@ class LLMOrchestrator:
     }
     
     def check_ollama(self):
+        # fast check to see if the server is up
         try:
             response = requests.get("http://localhost:11434/api/tags", timeout=2)
             return response.status_code == 200
@@ -987,7 +993,7 @@ def llm_evaluate():
 
 @app.route('/api/diagnostic')
 def diagnostic():
-    """Diagnostic endpoint"""
+    """Diagnostic endpoint - sanity check"""
     results = {
         'timestamp': datetime.now().isoformat(),
         'system': 'operational'

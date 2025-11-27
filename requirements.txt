@@ -1,0 +1,7 @@
+flask
+pandas
+numpy
+requests
+yfinance
+google-generativeai
+matplotlib
