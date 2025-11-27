@@ -1,9 +1,9 @@
-# FinSight-X: Agentic Stock Analysis & Forecasting
+# Orca: Agentic Stock Analysis & Forecasting
 
 **Google 5-Day AI Agents Intensive – Capstone Project**
 
 ## Overview
-FinSight-X is an intelligent stock analysis agent that combines quantitative finance with multi-LLM reasoning. It helps users understand stocks from multiple angles by orchestrating a team of AI models to analyze price history, technical indicators, and quantum-inspired risk metrics.
+Orca is an intelligent stock analysis agent that combines quantitative finance with multi-LLM reasoning. It helps users understand stocks from multiple angles by orchestrating a team of AI models to analyze price history, technical indicators, and quantum-inspired risk metrics.
 
 ## Features
 - **Multi-Agent Orchestration**: Uses a "Think-Act-Observe" loop to manage analysis.

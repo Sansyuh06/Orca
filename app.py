@@ -1,4 +1,4 @@
-# Quantum Trading Platform - Ultra-Fixed Version with Multiple Data Sources
+# Orca - Agentic Stock Analysis Platform
 # Author: Sansyuh06
 # Last Updated: Nov 2025
 # Note: This is the main backend file. It handles data fetching, analysis, and LLM orchestration.
@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 app = Flask(__name__)
 
 # ============================================================================
-# STOCK ANALYZER - ULTRA-FIXED WITH MULTIPLE DATA SOURCES
+# ORCA STOCK ANALYZER
 # ============================================================================
 
 class StockAnalyzer:

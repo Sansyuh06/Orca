@@ -292,6 +292,10 @@ function displayAnalysis(data) {
     const forecastPanel = document.getElementById('forecast-panel');
     if (forecastPanel) forecastPanel.classList.remove('hidden');
 
+    // Update page title
+    document.title = `Orca | ${data.symbol}`;
+
+    // Update chart title
     const chartTitle = document.getElementById('chart-title');
     if (chartTitle) {
         chartTitle.textContent = `${data.symbol} - ${data.company.name}`;
