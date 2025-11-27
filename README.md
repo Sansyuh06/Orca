@@ -1,29 +1,29 @@
 # Orca: Agentic Stock Analysis & Forecasting
 
-**Google 5-Day AI Agents Intensive – Capstone Project**
+**Google 5-Day AI Agents Intensive  Capstone Project**
 
-## 🌊 Overview
+##  Overview
 
 Orca is an intelligent, autonomous stock analysis agent that revolutionizes how retail investors understand the market. Unlike traditional static dashboards that merely display data, Orca actively *investigates* stocks for you, combining quantitative finance with cutting-edge multi-LLM reasoning to deliver institutional-grade insights in plain English.
 
 ### The Problem We Solve
 
-Retail investors face an overwhelming paradox: they have access to the same raw data as Wall Street professionals—price charts, technical indicators, SEC filings, news feeds—but lack the time, expertise, and tools to synthesize this information into actionable insights. Existing solutions fall into two extremes:
+Retail investors face an overwhelming paradox: they have access to the same raw data as Wall Street professionalsprice charts, technical indicators, SEC filings, news feedsbut lack the time, expertise, and tools to synthesize this information into actionable insights. Existing solutions fall into two extremes:
 
 - **Too Simple**: Basic charting apps that show price movements but offer no context or analysis
 - **Too Complex**: Professional terminals (Bloomberg, Reuters) with steep learning curves and prohibitive costs
 
-**Orca bridges this gap**, acting as your personal AI quantitative analyst that doesn't just show you data—it *explains* it.
+**Orca bridges this gap**, acting as your personal AI quantitative analyst that doesn't just show you datait *explains* it.
 
-## ✨ Key Features
+##  Key Features
 
-### 🤖 Multi-Agent Orchestration
+###  Multi-Agent Orchestration
 Orca implements a sophisticated "Think-Act-Observe" loop inspired by the Google Agent Development Kit (ADK):
 - **Think**: Analyzes market data and determines which tools to use
 - **Act**: Executes calculations, fetches data, and runs forecasts
 - **Observe**: Synthesizes results and learns from outcomes
 
-### 🧠 Multi-Model Consensus ("Panel of Experts")
+###  Multi-Model Consensus ("Panel of Experts")
 Instead of relying on a single AI model, Orca orchestrates multiple specialized LLMs working in parallel:
 - **Mistral 7B**: General reasoning and balanced analysis
 - **Phi-3 Mini**: Efficient, concise technical insights
@@ -33,7 +33,7 @@ Instead of relying on a single AI model, Orca orchestrates multiple specialized 
 
 Each model analyzes the stock independently, providing diverse perspectives that reduce bias and hallucinations.
 
-### ⚖️ Judge-Evaluated Outputs
+###  Judge-Evaluated Outputs
 A separate "Judge" model (DeepSeek-R1) evaluates all expert responses using strict criteria:
 - **Accuracy** (0-2 points): Factual correctness
 - **Depth of Analysis** (0-2 points): Insight quality beyond surface-level observations
@@ -43,7 +43,7 @@ A separate "Judge" model (DeepSeek-R1) evaluates all expert responses using stri
 
 Only the highest-scoring response is presented to the user, ensuring quality and reducing information overload.
 
-### 🛠️ Advanced Custom Tools
+###  Advanced Custom Tools
 
 #### Technical Indicators
 - **RSI (Relative Strength Index)**: Identifies overbought/oversold conditions
@@ -59,51 +59,51 @@ Only the highest-scoring response is presented to the user, ensuring quality and
 #### Quantum-Inspired Risk Assessment
 A novel proprietary metric that amplifies volatility signals to detect hidden risks:
 ```
-Quantum Risk = Volatility × 1.2
-Trade Probability = max(0, 100 - 0.7 × Quantum Risk)
+Quantum Risk = Volatility  1.2
+Trade Probability = max(0, 100 - 0.7  Quantum Risk)
 ```
 This provides early warning signals that traditional metrics might miss.
 
-### 🔍 Glass Box Observability
+###  Glass Box Observability
 Complete transparency into the agent's decision-making process:
 - Real-time execution trace showing every tool call
-- Timestamped logs of each phase (Mission → Scan → Think → Act → Observe)
+- Timestamped logs of each phase (Mission  Scan  Think  Act  Observe)
 - Performance metrics (execution time, model response times)
 - Full audit trail for reproducibility and trust
 
-### 💾 Session Memory & Context Awareness
+###  Session Memory & Context Awareness
 Persistent memory system that enables natural conversations:
 - **Short-term Memory**: Maintains conversation context for follow-up questions
 - **Long-term Memory**: Stores user preferences (risk tolerance, favorite sectors, investment horizon)
 - **Contextual Responses**: Adapts analysis based on previous interactions
 
-## 🏗️ Architecture
+##  Architecture
 
 Orca follows the **Model + Tools + Orchestration** pattern from the Google ADK:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    User Interface                        │
-│         (Interactive Dashboard + Chat Canvas)            │
-└────────────────────┬────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────┐
-│                  Orchestrator                            │
-│         (ADK Agent - Think-Act-Observe Loop)             │
-└─────┬──────────────┬──────────────┬─────────────────────┘
-      │              │              │
-┌─────▼─────┐  ┌────▼─────┐  ┌─────▼──────┐
-│   Tools   │  │  Models  │  │   Memory   │
-│           │  │          │  │            │
-│ • Data    │  │ • Panel  │  │ • Session  │
-│   Fetch   │  │   of     │  │   Context  │
-│ • Tech    │  │   Experts│  │ • User     │
-│   Calc    │  │ • Judge  │  │   Prefs    │
-│ • ML      │  │   Model  │  │            │
-│   Forecast│  │          │  │            │
-│ • Quantum │  │          │  │            │
-│   Risk    │  │          │  │            │
-└───────────┘  └──────────┘  └────────────┘
+
+                    User Interface                        
+         (Interactive Dashboard + Chat Canvas)            
+
+                     
+
+                  Orchestrator                            
+         (ADK Agent - Think-Act-Observe Loop)             
+
+                                  
+    
+   Tools       Models       Memory   
+                                     
+  Data        Panel      Session  
+   Fetch        of          Context  
+  Tech         Experts    User     
+   Calc        Judge       Prefs    
+  ML           Model                
+   Forecast                          
+  Quantum                           
+   Risk                              
+    
 ```
 
 ### Component Details
@@ -133,7 +133,7 @@ Orca follows the **Model + Tools + Orchestration** pattern from the Google ADK:
    - Long-term: Persistent user preferences
    - Context injection for personalized responses
 
-## 🚀 Installation & Setup
+##  Installation & Setup
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -182,7 +182,7 @@ Open your browser and navigate to:
 http://localhost:5000
 ```
 
-## 📖 Usage Guide
+##  Usage Guide
 
 ### Basic Analysis Workflow
 
@@ -215,7 +215,7 @@ http://localhost:5000
 
 ### AI Canvas (Interactive Chat)
 
-1. **Click "🎨 Open AI Canvas"**: Opens an immersive full-screen chat interface
+1. **Click " Open AI Canvas"**: Opens an immersive full-screen chat interface
 
 2. **Ask Questions**: Natural language queries like:
    - "Is this a good long-term investment?"
@@ -224,7 +224,7 @@ http://localhost:5000
 
 3. **Get Contextual Answers**: The agent remembers previous interactions and provides personalized responses
 
-## 🛠️ Technologies & Stack
+##  Technologies & Stack
 
 ### Backend
 - **Python 3.8+**: Core application logic
@@ -253,7 +253,7 @@ http://localhost:5000
 - **Panel of Experts**: Multi-model consensus pattern
 - **Glass Box**: Full observability and transparency
 
-## 📊 Example Output
+##  Example Output
 
 For **AAPL** (Apple Inc.):
 ```
@@ -262,26 +262,26 @@ Confidence: HIGH
 Risk Level: LOW
 
 Current Price: $180.45
-30-Day Forecast: UP +5.2% → $189.83
+30-Day Forecast: UP +5.2%  $189.83
 Quantum Risk: 18.4%
 Trade Probability: 87.1%
 
 Key Signals:
-✓ Price above MA20 (bullish)
-✓ RSI neutral (52.3)
-✓ MACD bullish crossover
-✓ ML predicts UP
-✓ Low volatility (15.3%)
+ Price above MA20 (bullish)
+ RSI neutral (52.3)
+ MACD bullish crossover
+ ML predicts UP
+ Low volatility (15.3%)
 ```
 
-## 🔒 Privacy & Security
+##  Privacy & Security
 
 - **No Data Storage**: Market data is fetched in real-time and not stored
 - **Local Inference**: LLMs run locally via Ollama (no data sent to external APIs by default)
 - **Session-Based Memory**: User data is ephemeral and session-scoped
 - **Open Source**: Full code transparency for security auditing
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Areas for improvement:
 - Additional technical indicators (Fibonacci, Ichimoku Cloud)
@@ -290,17 +290,17 @@ Contributions are welcome! Areas for improvement:
 - Cryptocurrency support
 - Portfolio optimization tools
 
-## 📄 License
+##  License
 
 MIT License - See LICENSE file for details
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Google AI Agents Intensive**: For the ADK framework and agent design patterns
 - **Ollama Team**: For making local LLM inference accessible
 - **Open-Source Community**: For the incredible models (Mistral, Llama, Phi-3, etc.)
 
-## 📞 Contact
+##  Contact
 
 - **Developer**: Sansyuh06
 - **GitHub**: https://github.com/Sansyuh06/stocks
@@ -308,4 +308,4 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Orca: Trade Smarter, Not Harder** 🌊📈
+**Orca: Trade Smarter, Not Harder** 

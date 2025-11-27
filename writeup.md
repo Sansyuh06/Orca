@@ -1,15 +1,15 @@
 # Orca: Agentic Stock Analysis & Forecasting
-## Google 5-Day AI Agents Intensive – Capstone Project
+## Google 5-Day AI Agents Intensive  Capstone Project
 
 ---
 
-## 📋 Problem Statement — The Challenge We're Solving
+##  Problem Statement  The Challenge We're Solving
 
 Retail investors today face a **crisis of information overload**. The democratization of financial data means that anyone with an internet connection has access to the same raw information as Wall Street professionals: real-time price charts, SEC filings, earnings reports, analyst ratings, and 24/7 news feeds. Yet paradoxically, this abundance of data has created a new barrier to entry.
 
 ### The Core Issues:
 
-1. **Time Scarcity**: Analyzing a single stock properly requires hours of research—reviewing financial statements, calculating technical indicators, reading analyst reports, and synthesizing conflicting signals. Most retail investors simply don't have this time.
+1. **Time Scarcity**: Analyzing a single stock properly requires hours of researchreviewing financial statements, calculating technical indicators, reading analyst reports, and synthesizing conflicting signals. Most retail investors simply don't have this time.
 
 2. **Expertise Gap**: Understanding what RSI, MACD, Sharpe ratios, and beta coefficients actually *mean* requires specialized knowledge. Traditional tools display these metrics but don't explain their significance in context.
 
@@ -25,7 +25,7 @@ This gap leads to poor investment decisions. Studies show that retail investors 
 
 ---
 
-## 🤖 Why Agents? — Why This Problem Demands an Agentic Solution
+##  Why Agents?  Why This Problem Demands an Agentic Solution
 
 Traditional software is fundamentally **static and reactive**. A conventional stock analysis app displays data when you request it, but it doesn't *understand* what it's showing you. It can't adapt its analysis based on market conditions, and it certainly can't explain its reasoning.
 
@@ -33,16 +33,16 @@ Traditional software is fundamentally **static and reactive**. A conventional st
 
 ### 1. Autonomous Decision-Making
 An agent can look at a stock and decide *which* analysis tools are relevant:
-- For a volatile tech stock → Emphasize momentum indicators (MACD, RSI)
-- For a stable dividend stock → Focus on fundamental metrics (P/E ratio, yield)
-- For a news-driven stock → Prioritize sentiment analysis
+- For a volatile tech stock  Emphasize momentum indicators (MACD, RSI)
+- For a stable dividend stock  Focus on fundamental metrics (P/E ratio, yield)
+- For a news-driven stock  Prioritize sentiment analysis
 
 Traditional software requires the user to manually select these tools. An agent makes these decisions autonomously based on context.
 
 ### 2. Dynamic Tool Use
 Stock analysis isn't a linear process. Sometimes you need to:
-- Fetch data → Calculate indicators → Run forecast → Reassess risk
-- Other times: Fetch data → Detect anomaly → Fetch more granular data → Recalculate
+- Fetch data  Calculate indicators  Run forecast  Reassess risk
+- Other times: Fetch data  Detect anomaly  Fetch more granular data  Recalculate
 
 An agent can execute this **Think-Act-Observe loop** iteratively, adjusting its strategy based on intermediate results. This is impossible with static scripts.
 
@@ -64,65 +64,65 @@ This "Glass Box" transparency is critical for adoption and regulatory compliance
 
 ---
 
-## 🏗️ What I Created — The Orca Architecture
+##  What I Created  The Orca Architecture
 
-I built **Orca**, an autonomous AI Quantitative Analyst that doesn't just analyze stocks—it *investigates* them like a professional analyst would.
+I built **Orca**, an autonomous AI Quantitative Analyst that doesn't just analyze stocksit *investigates* them like a professional analyst would.
 
 ### System Architecture: The "Panel of Experts" Pattern
 
 ```
 User Query: "Should I buy AAPL?"
-         ↓
-┌────────────────────────────────────────┐
-│      ORCHESTRATOR (ADK Agent)          │
-│   Think-Act-Observe Loop Controller    │
-└────────┬───────────────────────────────┘
-         │
-    ┌────▼─────┐
-    │  THINK   │ → Analyze query, determine strategy
-    └────┬─────┘
-         │
-    ┌────▼─────┐
-    │   ACT    │ → Execute tools in parallel:
-    └────┬─────┘   • fetch_price_data()
-         │          • compute_indicators()
-         │          • run_forecast()
-         │          • quantum_risk()
-         │
-    ┌────▼─────┐
-    │ OBSERVE  │ → Collect results, update memory
-    └────┬─────┘
-         │
-┌────────▼────────────────────────────────┐
-│     PANEL OF EXPERTS (Multi-LLM)        │
-│                                         │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐│
-│  │Mistral  │  │ Llama 3 │  │  Phi-3  ││
-│  │"Balanced│  │ "Deep   │  │"Concise"││
-│  │ Analyst"│  │Analysis"│  │         ││
-│  └────┬────┘  └────┬────┘  └────┬────┘│
-│       │            │            │     │
-│       └────────────┼────────────┘     │
-│                    │                  │
-│            ┌───────▼────────┐         │
-│            │  JUDGE MODEL   │         │
-│            │  (DeepSeek-R1) │         │
-│            │                │         │
-│            │ Scores each    │         │
-│            │ response 1-10  │         │
-│            │ on:            │         │
-│            │ • Accuracy     │         │
-│            │ • Depth        │         │
-│            │ • Relevance    │         │
-│            │ • Clarity      │         │
-│            │ • Actionability│         │
-│            └───────┬────────┘         │
-└────────────────────┼──────────────────┘
-                     │
-              ┌──────▼───────┐
-              │ BEST RESPONSE│
-              │   (Score: 9) │
-              └──────────────┘
+         
+
+      ORCHESTRATOR (ADK Agent)          
+   Think-Act-Observe Loop Controller    
+
+         
+    
+      THINK     Analyze query, determine strategy
+    
+         
+    
+       ACT      Execute tools in parallel:
+        fetch_price_data()
+                    compute_indicators()
+                    run_forecast()
+                    quantum_risk()
+         
+    
+     OBSERVE    Collect results, update memory
+    
+         
+
+     PANEL OF EXPERTS (Multi-LLM)        
+                                         
+      
+  Mistral     Llama 3     Phi-3  
+  "Balanced   "Deep     "Concise"
+   Analyst"  Analysis"           
+      
+                                    
+            
+                                      
+                     
+              JUDGE MODEL            
+              (DeepSeek-R1)          
+                                     
+             Scores each             
+             response 1-10           
+             on:                     
+              Accuracy              
+              Depth                 
+              Relevance             
+              Clarity               
+              Actionability         
+                     
+
+                     
+              
+               BEST RESPONSE
+                 (Score: 9) 
+              
 ```
 
 ### Key Innovations:
@@ -143,11 +143,11 @@ A separate **DeepSeek-R1** model acts as an impartial judge, scoring each expert
 
 ```python
 SCORING BREAKDOWN:
-• Accuracy (0-2): Factual correctness, no hallucinations
-• Depth (0-2): Insight quality beyond surface-level observations  
-• Relevance (0-2): Direct addressing of the user's question
-• Clarity (0-2): Communication effectiveness, structure
-• Actionability (0-2): Practical value for decision-making
+ Accuracy (0-2): Factual correctness, no hallucinations
+ Depth (0-2): Insight quality beyond surface-level observations  
+ Relevance (0-2): Direct addressing of the user's question
+ Clarity (0-2): Communication effectiveness, structure
+ Actionability (0-2): Practical value for decision-making
 
 STRICT GRADING RULES:
 - 10: Exceptional, comprehensive, no flaws
@@ -180,7 +180,7 @@ def compute_indicators(data):
     # Vectorized calculations for speed:
     - RSI (14-period)
     - MACD (12, 26, 9)
-    - Bollinger Bands (20, 2σ)
+    - Bollinger Bands (20, 2)
     - MA20, MA50
     
     # Returns: Dict of indicator values
@@ -191,7 +191,7 @@ def compute_indicators(data):
 def run_forecast(data, horizon=30):
     # Linear regression on historical prices
     # Projects 30-day forward trend
-    # Calculates R² confidence score
+    # Calculates R confidence score
     
     # Returns: {direction, expected_change, confidence}
 ```
@@ -214,11 +214,11 @@ Every step of the agent's execution is logged and visualized:
 
 ```
 [ADK-MISSION] agent/parse_mission: processing
-[ADK-SCAN] tool/fetch_price_data: processing → complete (342ms)
-[ADK-SCAN] tool/compute_indicators: processing → complete (89ms)
-[ADK-SCAN] tool/run_forecast: processing → complete (156ms)
-[ADK-THINK] model/multi_llm_panel: processing → complete (2.3s)
-[ADK-ACT] judge/evaluate: processing → complete (1.8s)
+[ADK-SCAN] tool/fetch_price_data: processing  complete (342ms)
+[ADK-SCAN] tool/compute_indicators: processing  complete (89ms)
+[ADK-SCAN] tool/run_forecast: processing  complete (156ms)
+[ADK-THINK] model/multi_llm_panel: processing  complete (2.3s)
+[ADK-ACT] judge/evaluate: processing  complete (1.8s)
 [ADK-OBSERVE] agent/collect: complete
 ```
 
@@ -253,7 +253,7 @@ This enables natural follow-up questions:
 
 ---
 
-## 🎬 Demo — How It Works in Practice
+##  Demo  How It Works in Practice
 
 ### Scenario: Analyzing Apple (AAPL)
 
@@ -275,10 +275,10 @@ and run a 30-day forecast."
 *ACT Phase:*
 ```
 [Parallel Execution]
-→ fetch_price_data(AAPL) → 252 data points retrieved
-→ compute_indicators() → RSI: 52.3, MACD: +2.1
-→ run_forecast() → UP +5.2% (Confidence: 78%)
-→ quantum_risk() → Risk: 18.4%, Trade Prob: 87.1%
+ fetch_price_data(AAPL)  252 data points retrieved
+ compute_indicators()  RSI: 52.3, MACD: +2.1
+ run_forecast()  UP +5.2% (Confidence: 78%)
+ quantum_risk()  Risk: 18.4%, Trade Prob: 87.1%
 ```
 
 *OBSERVE Phase:*
@@ -325,7 +325,7 @@ The user sees:
 
 ---
 
-## 🔧 The Build — Technical Implementation Details
+##  The Build  Technical Implementation Details
 
 ### Technology Stack
 
@@ -432,7 +432,7 @@ def _register_tools(self):
 
 ---
 
-## 🚀 If I Had More Time — Future Enhancements
+##  If I Had More Time  Future Enhancements
 
 ### 1. Live Trading Integration
 **Goal**: Allow the agent to execute paper trades based on its analysis.
@@ -491,20 +491,20 @@ def _register_tools(self):
 
 ---
 
-## 📊 Conclusion
+##  Conclusion
 
-Orca demonstrates that **agents are not just chatbots with tools**—they are autonomous systems capable of complex, multi-step reasoning that adapts to context. By combining:
+Orca demonstrates that **agents are not just chatbots with tools**they are autonomous systems capable of complex, multi-step reasoning that adapts to context. By combining:
 
 1. **Multi-model consensus** (reducing hallucinations)
 2. **Custom financial tools** (domain-specific capabilities)
 3. **Glass Box observability** (building trust)
 4. **Session memory** (enabling natural conversations)
 
-...we've created a system that doesn't just analyze stocks—it *understands* them. This is the future of financial technology: AI that acts as a true partner, not just a data display.
+...we've created a system that doesn't just analyze stocksit *understands* them. This is the future of financial technology: AI that acts as a true partner, not just a data display.
 
 The Google AI Agents Intensive provided the perfect framework (ADK) to bring this vision to life. Orca is proof that agentic systems can solve real-world problems that traditional software cannot.
 
-**Thank you for this incredible learning opportunity.** 🙏
+**Thank you for this incredible learning opportunity.** 
 
 ---
 
