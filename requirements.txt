@@ -5,3 +5,4 @@ requests
 yfinance
 google-generativeai
 matplotlib
+python-dotenv

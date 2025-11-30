@@ -53,22 +53,6 @@ Only the highest-scoring response is presented to the user, ensuring quality and
 
 #### ML Price Forecasting
 - Linear regression model trained on historical price data
-- 30-day forward price predictions with confidence intervals
-- Trend direction analysis (UP/DOWN) with expected percentage change
-
-#### Quantum-Inspired Risk Assessment
-A novel proprietary metric that amplifies volatility signals to detect hidden risks:
-```
-Quantum Risk = Volatility  1.2
-Trade Probability = max(0, 100 - 0.7  Quantum Risk)
-```
-This provides early warning signals that traditional metrics might miss.
-
-###  Glass Box Observability
-Complete transparency into the agent's decision-making process:
-- Real-time execution trace showing every tool call
-- Timestamped logs of each phase (Mission  Scan  Think  Act  Observe)
-- Performance metrics (execution time, model response times)
 - Full audit trail for reproducibility and trust
 
 ###  Session Memory & Context Awareness

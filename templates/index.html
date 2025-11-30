@@ -5,16 +5,19 @@
   Built with vanilla JS + Chart.js because React was overkill for this part.
 -->
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orca | Agentic Stock Analysis</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -60,7 +63,8 @@
             padding: 16px 0;
             position: sticky;
             top: 0;
-            z-index: 100; /* Keep this above the chart canvas! */
+            z-index: 100;
+            /* Keep this above the chart canvas! */
             backdrop-filter: blur(10px);
         }
 
@@ -105,8 +109,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .main {
@@ -145,7 +156,8 @@
             margin-bottom: 8px;
         }
 
-        select, button {
+        select,
+        button {
             width: 100%;
             padding: 12px;
             background: var(--surface);
@@ -158,7 +170,8 @@
             transition: all 0.2s;
         }
 
-        select:hover, button:hover:not(:disabled) {
+        select:hover,
+        button:hover:not(:disabled) {
             background: var(--surface-elevated);
             border-color: var(--accent);
         }
@@ -213,8 +226,13 @@
             font-weight: 600;
         }
 
-        .price-change.positive { color: var(--success); }
-        .price-change.negative { color: var(--danger); }
+        .price-change.positive {
+            color: var(--success);
+        }
+
+        .price-change.negative {
+            color: var(--danger);
+        }
 
         .rec-badge {
             padding: 6px 12px;
@@ -224,9 +242,20 @@
             text-transform: uppercase;
         }
 
-        .rec-buy { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .rec-hold { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .rec-sell { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .rec-buy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .rec-hold {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .rec-sell {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
 
         .chart-canvas {
             height: 420px;
@@ -250,7 +279,7 @@
 
         .metric-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .metric-label {
@@ -268,9 +297,17 @@
             transition: color 0.3s;
         }
 
-        .metric-value.positive { color: var(--success); }
-        .metric-value.negative { color: var(--danger); }
-        .metric-value.quantum { color: var(--quantum); }
+        .metric-value.positive {
+            color: var(--success);
+        }
+
+        .metric-value.negative {
+            color: var(--danger);
+        }
+
+        .metric-value.quantum {
+            color: var(--quantum);
+        }
 
         .forecast-panel {
             background: var(--surface);
@@ -300,8 +337,13 @@
             margin-bottom: 8px;
         }
 
-        .forecast-direction.up { color: var(--success); }
-        .forecast-direction.down { color: var(--danger); }
+        .forecast-direction.up {
+            color: var(--success);
+        }
+
+        .forecast-direction.down {
+            color: var(--danger);
+        }
 
         .forecast-details {
             font-size: 12px;
@@ -338,9 +380,20 @@
             margin-bottom: 12px;
         }
 
-        .sentiment-bullish { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .sentiment-bearish { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .sentiment-neutral { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .sentiment-bullish {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .sentiment-bearish {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .sentiment-neutral {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
 
         .model-list {
             display: flex;
@@ -365,6 +418,34 @@
             background: var(--surface-elevated);
             transform: translateX(4px);
         }
+
+        /* Tooltip Styles */
+        .model-card[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+            margin-bottom: 5px;
+        }
+
+        .section-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
 
         .model-card.selected {
             border-color: var(--accent);
@@ -415,9 +496,17 @@
             border-radius: 50%;
         }
 
-        .signal-dot.bullish { background: var(--success); }
-        .signal-dot.bearish { background: var(--danger); }
-        .signal-dot.neutral { background: var(--warning); }
+        .signal-dot.bullish {
+            background: var(--success);
+        }
+
+        .signal-dot.bearish {
+            background: var(--danger);
+        }
+
+        .signal-dot.neutral {
+            background: var(--warning);
+        }
 
         .signal-text {
             font-size: 13px;
@@ -507,8 +596,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
         }
 
         .streaming-indicator .dot {
@@ -553,8 +649,15 @@
         }
 
         @keyframes pulse-icon {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         /* Canvas Modal - FIXED */
@@ -622,7 +725,7 @@
                         </select>
                     </div>
                     <button id="analyze-btn" disabled>Analyze Stock</button>
-                    
+
                     <div id="agent-btn-container" class="agent-btn-container hidden">
                         <button id="open-agent-btn" class="agent-btn">
                             🎨 Open AI Canvas
@@ -637,6 +740,16 @@
                         <span id="model-count">0 selected</span>
                     </div>
                     <button id="consensus-btn" disabled>Get AI Consensus</button>
+                </div>
+
+                <div class="panel" style="margin-top: 20px;">
+                    <div class="panel-header">Portfolio Analysis</div>
+                    <div class="control-group">
+                        <div class="control-label">Upload Portfolio (PDF/Images)</div>
+                        <input type="file" id="portfolio-upload" multiple accept=".pdf,.jpg,.jpeg,.png"
+                            style="width: 100%; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary);">
+                    </div>
+                    <button id="analyze-portfolio-btn">Analyze Portfolio</button>
                 </div>
             </div>
 
@@ -653,7 +766,8 @@
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <div class="chart-title" id="chart-title">Stock Chart</div>
                                 <button id="realtime-toggle-btn" class="realtime-toggle" style="display: none;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
                                         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                                         <polyline points="17 6 23 6 23 12"></polyline>
                                     </svg>
@@ -722,11 +836,33 @@
                 </div>
 
                 <div class="panel">
-                    <div class="panel-header">AI Consensus</div>
+                    <div class="panel-header">
+                        <div class="panel-title">AI Consensus</div>
+                    </div>
+
+                    <div class="section-info">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Select models to get diverse perspectives. Click a model to include it in the consensus
+                        analysis.
+                    </div>
+
                     <div id="llm-loading" class="llm-loading">
                         <div>Processing with AI models...</div>
                     </div>
                     <div id="responses-container" class="responses-container"></div>
+                </div>
+
+                <div class="panel" style="margin-top: 20px;" id="portfolio-result-panel">
+                    <div class="panel-header">Portfolio Analysis Report</div>
+                    <div id="portfolio-loading" class="llm-loading">
+                        <div>Analyzing portfolio documents...</div>
+                    </div>
+                    <div id="portfolio-content" class="response-text" style="white-space: pre-wrap;"></div>
                 </div>
             </div>
 
@@ -776,4 +912,5 @@
     <!-- Load canvas as JSX (development). For production precompile/jsx -> JS instead. -->
     <script type="text/babel" src="/static/canvas.js"></script>
 </body>
+
 </html>

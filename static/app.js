@@ -86,6 +86,8 @@ function renderModelList(models) {
         const card = document.createElement('div');
         card.className = 'model-card';
         card.dataset.modelId = model.id;
+        card.setAttribute('data-tooltip', 'Press to select this model for analysis');
+        card.style.position = 'relative'; // For tooltip positioning
 
         card.innerHTML = `
             <div class="model-checkbox"></div>
@@ -203,6 +205,11 @@ function setupEventListeners() {
     window.addEventListener('beforeunload', () => {
         stopRealtimeUpdates();
     });
+
+    const portfolioBtn = document.getElementById('analyze-portfolio-btn');
+    if (portfolioBtn) {
+        portfolioBtn.addEventListener('click', handlePortfolioAnalyze);
+    }
 }
 
 // ============================================================================
@@ -768,6 +775,80 @@ function displayConsensusResults(data) {
         `;
         container.appendChild(card);
     });
+}
+
+// ============================================================================
+// PORTFOLIO ANALYSIS
+// ============================================================================
+
+async function handlePortfolioAnalyze() {
+    const fileInput = document.getElementById('portfolio-upload');
+    const files = fileInput.files;
+
+    if (!files || files.length === 0) {
+        showError('Please select at least one file (PDF or Image)');
+        return;
+    }
+
+    const btn = document.getElementById('analyze-portfolio-btn');
+    const loadingEl = document.getElementById('portfolio-loading');
+    const contentEl = document.getElementById('portfolio-content');
+
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Analyzing Portfolio...';
+    }
+
+    if (loadingEl) loadingEl.classList.add('active');
+    if (contentEl) contentEl.textContent = '';
+
+    try {
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+
+        console.log('📂 Uploading portfolio documents...');
+        const response = await fetch('/api/analyze_portfolio', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            showError(data.error);
+        } else {
+            console.log('✓ Portfolio analysis complete');
+            if (contentEl) {
+                // Simple markdown rendering (bold, headers, lists)
+                let text = data.analysis;
+
+                // Bold
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                // Headers
+                text = text.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+                text = text.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+                text = text.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+
+                // Lists
+                text = text.replace(/^\- (.*$)/gm, '<li>$1</li>');
+
+                contentEl.innerHTML = text;
+            }
+        }
+
+    } catch (error) {
+        console.error('✗ Portfolio analysis error:', error);
+        showError('Portfolio analysis failed: ' + error.message);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Analyze Portfolio';
+        }
+        if (loadingEl) loadingEl.classList.remove('active');
+    }
 }
 
 // ============================================================================
