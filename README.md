@@ -33,18 +33,6 @@ Instead of relying on a single AI model, Orca orchestrates multiple specialized 
 
 Each model analyzes the stock independently, providing diverse perspectives that reduce bias and hallucinations.
 
-###  Judge-Evaluated Outputs
-A separate "Judge" model (DeepSeek-R1) evaluates all expert responses using strict criteria:
-- **Accuracy** (0-2 points): Factual correctness
-- **Depth of Analysis** (0-2 points): Insight quality beyond surface-level observations
-- **Relevance** (0-2 points): Direct addressing of the user's question
-- **Clarity & Structure** (0-2 points): Communication effectiveness
-- **Actionability** (0-2 points): Practical value for decision-making
-
-Only the highest-scoring response is presented to the user, ensuring quality and reducing information overload.
-
-###  Advanced Custom Tools
-
 #### Technical Indicators
 - **RSI (Relative Strength Index)**: Identifies overbought/oversold conditions
 - **MACD (Moving Average Convergence Divergence)**: Detects trend changes and momentum

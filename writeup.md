@@ -208,18 +208,6 @@ def quantum_risk(volatility):
 
 This proprietary metric provides early warning signals that traditional volatility measures might miss.
 
-#### 5. Portfolio Analysis (Gemini 2.0 Integration)
-
-I integrated **Google's Gemini 2.0 Flash** to analyze unstructured data:
-- **Input**: User uploads PDF statements or screenshots of charts.
-- **Process**: Gemini extracts text/visuals and compares holdings against key datasets (Stock Market Dataset, Financial Sheets).
-- **Output**: A professional "Executive Summary" with specific investment advice and market alignment checks.
-
-
-#### 4. Glass Box Observability (Full Transparency)
-
-Every step of the agent's execution is logged and visualized:
-
 ```
 [ADK-MISSION] agent/parse_mission: processing
 [ADK-SCAN] tool/fetch_price_data: processing  complete (342ms)
