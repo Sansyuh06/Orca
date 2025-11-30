@@ -1042,7 +1042,7 @@ def diagnostic():
 
 # Configure Gemini
 # Ideally this should be in an env var, but for now we'll check if it's set or use a placeholder
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GOOGLE_API_KEY = os.getenv(' enter api key ')
 if GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
 else:
