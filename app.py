@@ -12,28 +12,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta
 import warnings
-import sys
-import logging
-import os
-import google.generativeai as genai
-from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
-from dataclasses import dataclass, asdict
-from typing import List, Dict, Any, Callable
-
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-warnings.filterwarnings('ignore')
-
-app = Flask(__name__)
-
-# ============================================================================
-# ORCA STOCK ANALYZER
 # ============================================================================
 
 class StockAnalyzer:
@@ -151,21 +129,6 @@ class StockAnalyzer:
                     source = 'real_market_data' if method_name != 'Synthetic Data' else 'synthetic_data'
                     return hist, source
                 else:
-                    logger.warning(f"✗ {method_name} returned insufficient data")
-                    
-            except Exception as e:
-                logger.error(f"✗ {method_name} failed: {e}")
-                continue
-        
-        # If all methods fail
-        logger.error(f"All methods failed for {symbol}")
-        return None, None
-    
-    def analyze(self, symbol):
-        """Perform stock analysis with all fallbacks"""
-        # TODO: Refactor this massive function into smaller chunks. It's getting too big.
-        try:
-            logger.info(f"\n{'='*60}")
             logger.info(f"ANALYZING {symbol}")
             logger.info(f"{'='*60}")
             
@@ -186,143 +149,6 @@ class StockAnalyzer:
             
             # Ensure required columns exist
             required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
-            missing_cols = [col for col in required_cols if col not in hist.columns]
-            if missing_cols:
-                error_msg = f"Data missing columns: {missing_cols}"
-                logger.error(f"ERROR: {error_msg}")
-                return {'error': error_msg, 'symbol': symbol}
-            
-            # Get company info
-            company_name = self.companies.get(symbol, symbol)
-            current_price = float(hist['Close'].iloc[-1])
-            sector = 'Technology' if symbol in ['AAPL', 'MSFT', 'GOOGL', 'META', 'NVDA'] else 'Various'
-            market_cap = 0
-            pe_ratio = 'N/A'
-            
-            logger.info(f"Company: {company_name}")
-            logger.info(f"Current price: ${current_price:.2f}")
-            
-            # Calculate technical indicators
-            logger.info("Calculating technical indicators...")
-            
-            # Moving averages
-            hist['MA20'] = hist['Close'].rolling(window=min(20, len(hist)), min_periods=1).mean()
-            hist['MA50'] = hist['Close'].rolling(window=min(50, len(hist)), min_periods=1).mean()
-            
-            # RSI
-            delta = hist['Close'].diff()
-            gain = delta.where(delta > 0, 0).rolling(window=min(14, len(hist)), min_periods=1).mean()
-            loss = (-delta.where(delta < 0, 0)).rolling(window=min(14, len(hist)), min_periods=1).mean()
-            rs = gain / (loss + 1e-10)
-            hist['RSI'] = 100 - (100 / (1 + rs))
-            
-            # MACD
-            ema12 = hist['Close'].ewm(span=min(12, len(hist)), adjust=False).mean()
-            ema26 = hist['Close'].ewm(span=min(26, len(hist)), adjust=False).mean()
-            hist['MACD'] = ema12 - ema26
-            hist['MACD_Signal'] = hist['MACD'].ewm(span=min(9, len(hist)), adjust=False).mean()
-            
-            latest = hist.iloc[-1]
-            
-            # Calculate performance metrics
-            logger.info("Calculating performance metrics...")
-            returns = hist['Close'].pct_change().dropna()
-            
-            if len(returns) > 0:
-                total_return = ((hist['Close'].iloc[-1] / hist['Close'].iloc[0]) - 1) * 100
-                volatility = returns.std() * np.sqrt(252) * 100
-                sharpe = (returns.mean() * 252) / (returns.std() * np.sqrt(252)) if returns.std() != 0 else 0
-            else:
-                total_return = 0
-                volatility = 0
-                sharpe = 0
-            
-            # ML prediction
-            logger.info("Generating ML forecast...")
-            prices = hist['Close'].values
-            X = np.arange(len(prices))
-            
-            coeffs = np.polyfit(X, prices, 1)
-            slope = coeffs[0]
-            
-            future_X = np.arange(len(prices), len(prices) + 30)
-            predictions = [float(coeffs[1] + coeffs[0] * x) for x in future_X]
-            predictions = [max(0.01, p) for p in predictions]
-            
-            direction = "UP" if slope > 0 else "DOWN"
-            expected_change = ((predictions[-1] - prices[-1]) / prices[-1]) * 100
-            
-            y_pred = coeffs[1] + coeffs[0] * X
-            ss_res = np.sum((prices - y_pred) ** 2)
-            ss_tot = np.sum((prices - np.mean(prices)) ** 2)
-            r_squared = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
-            confidence = min(95, max(60, r_squared * 100))
-            
-            # Quantum metrics
-            quantum_risk = min(100, max(0, volatility * 1.2))
-            quantum_trade_prob = max(10, min(90, 100 - quantum_risk * 0.7))
-            
-            # Maximum drawdown
-            if len(returns) > 0:
-                cumulative = (1 + returns).cumprod()
-                running_max = cumulative.expanding().max()
-                drawdown = ((cumulative - running_max) / running_max) * 100
-                max_drawdown = abs(float(drawdown.min())) if len(drawdown) > 0 else 0.0
-            else:
-                max_drawdown = 0.0
-            
-            # Trading signals
-            logger.info("Analyzing trading signals...")
-            score = 50
-            signals = []
-            
-            try:
-                if not pd.isna(latest['Close']) and not pd.isna(latest['MA20']) and latest['Close'] > latest['MA20']:
-                    score += 10
-                    signals.append(("Price above MA20", "bullish"))
-                elif not pd.isna(latest['Close']) and not pd.isna(latest['MA20']):
-                    score -= 10
-                    signals.append(("Price below MA20", "bearish"))
-                
-                if not pd.isna(latest['MA20']) and not pd.isna(latest['MA50']) and latest['MA20'] > latest['MA50']:
-                    score += 5
-                    signals.append(("MA20 above MA50", "bullish"))
-                elif not pd.isna(latest['MA20']) and not pd.isna(latest['MA50']):
-                    score -= 5
-                    signals.append(("MA20 below MA50", "bearish"))
-                
-                rsi = float(latest['RSI']) if not pd.isna(latest['RSI']) else 50
-                if 40 <= rsi <= 60:
-                    score += 15
-                    signals.append((f"RSI neutral ({rsi:.1f})", "neutral"))
-                elif rsi > 70:
-                    score -= 10
-                    signals.append((f"RSI overbought ({rsi:.1f})", "bearish"))
-                elif rsi < 30:
-                    score += 10
-                    signals.append((f"RSI oversold ({rsi:.1f})", "bullish"))
-                
-                if not pd.isna(latest['MACD']) and not pd.isna(latest['MACD_Signal']) and latest['MACD'] > latest['MACD_Signal']:
-                    score += 10
-                    signals.append(("MACD bullish crossover", "bullish"))
-                elif not pd.isna(latest['MACD']) and not pd.isna(latest['MACD_Signal']):
-                    score -= 5
-                    signals.append(("MACD bearish", "bearish"))
-                
-                if direction == 'UP':
-                    score += 15
-                    signals.append((f"ML predicts {direction}", "bullish"))
-                else:
-                    score -= 10
-                    signals.append((f"ML predicts {direction}", "bearish"))
-                
-                if volatility < 20:
-                    score += 5
-                    signals.append((f"Low volatility ({volatility:.1f}%)", "bullish"))
-                elif volatility > 35:
-                    score -= 5
-                    signals.append((f"High volatility ({volatility:.1f}%)", "bearish"))
-                
             except Exception as e:
                 logger.warning(f"Signal calculation error: {e}")
                 signals.append(("Analysis complete", "neutral"))

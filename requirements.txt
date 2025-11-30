@@ -6,3 +6,4 @@ yfinance
 google-generativeai
 matplotlib
 python-dotenv
+statsmodels
