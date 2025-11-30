@@ -168,37 +168,6 @@ def fetch_data(symbol):
     # Try 4 sources in order:
     1. Yahoo Finance Direct API (fastest)
     2. yfinance Library (most reliable)
-    3. Alpha Vantage (fallback)
-    4. Synthetic Data Generator (demo mode)
-    
-    # Returns: OHLCV data + metadata
-```
-
-**b) Technical Indicator Calculator**
-```python
-def compute_indicators(data):
-    # Vectorized calculations for speed:
-    - RSI (14-period)
-    - MACD (12, 26, 9)
-    - Bollinger Bands (20, 2)
-    - MA20, MA50
-    
-    # Returns: Dict of indicator values
-```
-
-**c) ML Price Forecaster**
-```python
-def run_forecast(data, horizon=30):
-    # Linear regression on historical prices
-    # Projects 30-day forward trend
-    # Calculates R confidence score
-    
-    # Returns: {direction, expected_change, confidence}
-```
-
-**d) Quantum-Inspired Risk Assessment** *(Novel Contribution)*
-```python
-def quantum_risk(volatility):
     # Amplifies volatility signals to detect hidden risks
     quantum_risk = volatility * 1.2
     trade_probability = max(0, 100 - 0.7 * quantum_risk)
@@ -351,7 +320,7 @@ The user sees:
 
 **1. Agent Development Kit (ADK) Integration:**
 ```python
-class FinSightADKAgent:
+class OrcaADKAgent:
     def __init__(self, stock_analyzer, llm_orchestrator):
         self.observability = ADKObservability()
         self.memory_manager = ADKMemoryManager()

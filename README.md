@@ -38,9 +38,11 @@ Each model analyzes the stock independently, providing diverse perspectives that
 - **MACD (Moving Average Convergence Divergence)**: Detects trend changes and momentum
 - **Bollinger Bands**: Measures volatility and price extremes
 - **Moving Averages**: MA20 and MA50 for trend identification
+- **Advanced Metrics**: Williams %R, Stochastic Oscillator, ATR, CCI, and Volume Ratio
 
 #### ML Price Forecasting
-- Linear regression model trained on historical price data
+- **ARIMA Model**: Statistical forecasting for short-term price direction
+- **Linear Regression**: Trend line analysis for longer-term context
 - Full audit trail for reproducibility and trust
 
 ###  Session Memory & Context Awareness

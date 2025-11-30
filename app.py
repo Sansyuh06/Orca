@@ -2,7 +2,7 @@
 # Author: Sansyuh06
 # Last Updated: Nov 2025
 # Note: This is the main backend file. It handles data fetching, analysis, and LLM orchestration.
-
+import os
 from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import numpy as np
@@ -12,6 +12,27 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime, timedelta
 import warnings
+import logging
+from dataclasses import dataclass
+from typing import Dict, Any, Callable, List, Optional
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tools.sm_exceptions import ConvergenceWarning
+from werkzeug.utils import secure_filename
+
+# Try to import Gemini API
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+    genai = None  # Set to None to avoid NameError
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+
 # ============================================================================
 
 class StockAnalyzer:
@@ -53,6 +74,100 @@ class StockAnalyzer:
             params = {
                 'period1': start_time,
                 'period2': end_time,
+                'interval': '1d',
+                'includePrePost': 'false',
+                'events': 'div,split'
+            }
+            
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                result = data['chart']['result'][0]
+                
+                timestamps = result['timestamp']
+                quote = result['indicators']['quote'][0]
+                
+                df = pd.DataFrame({
+                    'Open': quote['open'],
+                    'High': quote['high'],
+                    'Low': quote['low'],
+                    'Close': quote['close'],
+                    'Volume': quote['volume']
+                }, index=pd.to_datetime(timestamps, unit='s'))
+                
+                df = df.dropna()
+                logger.info(f"✓ Yahoo Direct: Fetched {len(df)} rows")
+                return df
+            else:
+                logger.warning(f"Yahoo Direct failed: {response.status_code}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Yahoo Direct error: {e}")
+            return None
+
+    def fetch_with_yfinance(self, symbol):
+        """Fetch using yfinance library"""
+        try:
+            import yfinance as yf
+            logger.info(f"Trying yfinance for {symbol}...")
+            ticker = yf.Ticker(symbol)
+            df = ticker.history(period="1y")
+            
+            if not df.empty:
+                logger.info(f"✓ yfinance: Fetched {len(df)} rows")
+                return df
+            return None
+        except Exception as e:
+            logger.error(f"yfinance error: {e}")
+            return None
+
+    def fetch_alpha_vantage(self, symbol):
+        """Try Alpha Vantage API (free tier)"""
+        try:
+            logger.info(f"Trying Alpha Vantage for {symbol}...")
+            # Using demo API key - replace with your own for production
+            api_key = 'demo'
+            url = f'https://www.alphavantage.co/query'
+            params = {
+                'function': 'TIME_SERIES_DAILY',
+                'symbol': symbol,
+                'outputsize': 'full',
+                'apikey': api_key
+            }
+            
+            response = requests.get(url, params=params, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "Time Series (Daily)" in data:
+                    ts = data["Time Series (Daily)"]
+                    df = pd.DataFrame.from_dict(ts, orient='index')
+                    df.index = pd.to_datetime(df.index)
+                    df = df.astype(float)
+                    df = df.rename(columns={
+                        "1. open": "Open",
+                        "2. high": "High",
+                        "3. low": "Low",
+                        "4. close": "Close",
+                        "5. volume": "Volume"
+                    })
+                    df = df.sort_index()
+                    logger.info(f"✓ Alpha Vantage: Fetched {len(df)} rows")
+                    return df
+            return None
+        except Exception as e:
+            logger.error(f"Alpha Vantage error: {e}")
+            return None
+
+    def generate_synthetic_data(self, symbol):
+        """Generate realistic synthetic data for demo purposes"""
+        logger.warning(f"Generating synthetic data for {symbol} (no real data available)")
+        
+        # Base prices for known stocks
+        base_prices = {
+            'AAPL': 180.0, 'MSFT': 380.0, 'AMZN': 155.0, 'TSLA': 240.0,
             'GOOGL': 140.0, 'META': 350.0, 'NVDA': 500.0, 'NFLX': 480.0,
             'JPM': 155.0, 'JNJ': 160.0
         }
@@ -128,7 +243,114 @@ class StockAnalyzer:
                     
                     source = 'real_market_data' if method_name != 'Synthetic Data' else 'synthetic_data'
                     return hist, source
-                else:
+                    logger.warning(f"Method {method_name} returned invalid data")
+            except Exception as e:
+                logger.warning(f"Method {method_name} failed: {e}")
+        
+        logger.error("All data fetch methods failed")
+        return None, None
+    
+    def calculate_advanced_indicators(self, data):
+        """Calculate advanced technical indicators (RSI, MACD, Bollinger Bands, Williams %R, ATR, CCI)"""
+        df = data.copy()
+        
+        # Moving averages
+        for period in [5, 10, 20, 50, 100, 200]:
+            df[f'MA{period}'] = df['Close'].rolling(period, min_periods=1).mean()
+        
+        # Exponential moving averages
+        for period in [12, 26]:
+            df[f'EMA{period}'] = df['Close'].ewm(span=period).mean()
+        
+        # RSI
+        delta = df['Close'].diff()
+        gain = delta.where(delta > 0, 0).rolling(14, min_periods=1).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(14, min_periods=1).mean()
+        rs = gain / (loss + 1e-10)
+        df['RSI'] = 100 - (100 / (1 + rs))
+        
+        # Stochastic Oscillator
+        low_14 = df['Low'].rolling(14, min_periods=1).min()
+        high_14 = df['High'].rolling(14, min_periods=1).max()
+        df['%K'] = 100 * (df['Close'] - low_14) / (high_14 - low_14 + 1e-10)
+        df['%D'] = df['%K'].rolling(3, min_periods=1).mean()
+        
+        # MACD
+        exp1 = df['Close'].ewm(span=12).mean()
+        exp2 = df['Close'].ewm(span=26).mean()
+        df['MACD'] = exp1 - exp2
+        df['MACD_Signal'] = df['MACD'].ewm(span=9).mean()
+        df['MACD_Histogram'] = df['MACD'] - df['MACD_Signal']
+        
+        # Bollinger Bands
+        for period in [20]:
+            df[f'BB_Mid_{period}'] = df['Close'].rolling(period, min_periods=1).mean()
+            bb_std = df['Close'].rolling(period, min_periods=1).std()
+            df[f'BB_Upper_{period}'] = df[f'BB_Mid_{period}'] + (bb_std * 2)
+            df[f'BB_Lower_{period}'] = df[f'BB_Mid_{period}'] - (bb_std * 2)
+            df[f'BB_Width_{period}'] = df[f'BB_Upper_{period}'] - df[f'BB_Lower_{period}']
+        
+        # Williams %R
+        highest_high = df['High'].rolling(14, min_periods=1).max()
+        lowest_low = df['Low'].rolling(14, min_periods=1).min()
+        df['Williams_%R'] = -100 * (highest_high - df['Close']) / (highest_high - lowest_low + 1e-10)
+        
+        # Average True Range (ATR)
+        df['TR'] = np.maximum(df['High'] - df['Low'], 
+                             np.maximum(abs(df['High'] - df['Close'].shift(1)),
+                                        abs(df['Low'] - df['Close'].shift(1))))
+        df['ATR'] = df['TR'].rolling(14, min_periods=1).mean()
+        
+        # Volume indicators
+        df['Volume_MA'] = df['Volume'].rolling(20, min_periods=1).mean()
+        df['Volume_Ratio'] = df['Volume'] / (df['Volume_MA'] + 1e-10)
+        df['OBV'] = (df['Volume'] * np.sign(df['Close'].diff())).cumsum()
+        
+        # Commodity Channel Index (CCI)
+        tp = (df['High'] + df['Low'] + df['Close']) / 3
+        sma_tp = tp.rolling(20, min_periods=1).mean()
+        mad = tp.rolling(20, min_periods=1).apply(lambda x: np.mean(np.abs(x - x.mean())))
+        df['CCI'] = (tp - sma_tp) / (0.015 * mad + 1e-10)
+        
+        return df
+    
+    def forecast_short_term_price(self, hist_data, steps=1):
+        """Forecast short-term price using ARIMA"""
+        try:
+            # Use closing prices; take last 100 points for efficiency
+            prices = hist_data['Close'].tail(100).copy()
+            if len(prices) < 30:
+                return {'predicted_price': None, 'error': "Insufficient data"}
+            
+            # Suppress convergence warnings
+            warnings.filterwarnings('ignore', category=ConvergenceWarning)
+            
+            # Fit ARIMA (5,1,0) is a standard starting point for daily stock data
+            model = ARIMA(prices, order=(5, 1, 0))
+            model_fit = model.fit()
+            
+            # Forecast next step(s)
+            forecast = model_fit.get_forecast(steps=steps)
+            pred_price = forecast.predicted_mean.iloc[0]
+            
+            # Direction based on last price
+            last_price = prices.iloc[-1]
+            direction = "UP" if pred_price > last_price else "DOWN"
+            
+            return {
+                'predicted_price': float(pred_price),
+                'direction': direction,
+                'last_price': float(last_price)
+            }
+        except Exception as e:
+            logger.error(f"ARIMA Forecast error: {e}")
+            return {'predicted_price': None, 'error': str(e)}
+
+
+    def analyze(self, symbol):
+        """Perform stock analysis with all fallbacks"""
+        try:
+            logger.info(f"\n{'='*60}")
             logger.info(f"ANALYZING {symbol}")
             logger.info(f"{'='*60}")
             
@@ -149,6 +371,134 @@ class StockAnalyzer:
             
             # Ensure required columns exist
             required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+            missing_cols = [col for col in required_cols if col not in hist.columns]
+            if missing_cols:
+                error_msg = f"Data missing columns: {missing_cols}"
+                logger.error(f"ERROR: {error_msg}")
+                return {'error': error_msg, 'symbol': symbol}
+            
+            # Get company info
+            company_name = self.companies.get(symbol, symbol)
+            current_price = float(hist['Close'].iloc[-1])
+            sector = 'Technology' if symbol in ['AAPL', 'MSFT', 'GOOGL', 'META', 'NVDA'] else 'Various'
+            market_cap = 0
+            pe_ratio = 'N/A'
+            
+            logger.info(f"Company: {company_name}")
+            logger.info(f"Current price: ${current_price:.2f}")
+            
+            # Calculate technical indicators
+            logger.info("Calculating technical indicators...")
+            hist = self.calculate_advanced_indicators(hist)
+            latest = hist.iloc[-1]
+            
+            # Calculate performance metrics
+            logger.info("Calculating performance metrics...")
+            returns = hist['Close'].pct_change().dropna()
+            
+            if len(returns) > 0:
+                total_return = ((hist['Close'].iloc[-1] / hist['Close'].iloc[0]) - 1) * 100
+                volatility = returns.std() * np.sqrt(252) * 100
+                sharpe = (returns.mean() * 252) / (returns.std() * np.sqrt(252)) if returns.std() != 0 else 0
+            else:
+                total_return = 0
+                volatility = 0
+                sharpe = 0
+            
+            # ML prediction
+            logger.info("Generating ML forecast...")
+            forecast = self.forecast_short_term_price(hist, steps=30)
+            
+            direction = forecast.get('direction', 'SIDEWAYS')
+            expected_change = 0.0
+            confidence = 0.0
+            predictions = []
+            
+            if 'predicted_price' in forecast and forecast['predicted_price'] is not None:
+                pred_price = forecast['predicted_price']
+                last_price = forecast.get('last_price', current_price)
+                expected_change = ((pred_price - last_price) / last_price) * 100
+                confidence = 85.0 # Placeholder confidence for ARIMA
+                
+                # Generate a simple linear interpolation for the chart
+                predictions = np.linspace(last_price, pred_price, 30).tolist()
+            else:
+                # Fallback to linear regression if ARIMA fails
+                prices = hist['Close'].values
+                X = np.arange(len(prices))
+                coeffs = np.polyfit(X, prices, 1)
+                slope = coeffs[0]
+                future_X = np.arange(len(prices), len(prices) + 30)
+                predictions = [float(coeffs[1] + coeffs[0] * x) for x in future_X]
+                direction = "UP" if slope > 0 else "DOWN"
+                expected_change = ((predictions[-1] - prices[-1]) / prices[-1]) * 100
+                confidence = 70.0
+            
+            # Quantum metrics
+            quantum_risk = min(100, max(0, volatility * 1.2))
+            quantum_trade_prob = max(10, min(90, 100 - quantum_risk * 0.7))
+            
+            # Maximum drawdown
+            if len(returns) > 0:
+                cumulative = (1 + returns).cumprod()
+                running_max = cumulative.expanding().max()
+                drawdown = ((cumulative - running_max) / running_max) * 100
+                max_drawdown = abs(float(drawdown.min())) if len(drawdown) > 0 else 0.0
+            else:
+                max_drawdown = 0.0
+            
+            # Trading signals
+            logger.info("Analyzing trading signals...")
+            score = 50
+            signals = []
+            
+            try:
+                if not pd.isna(latest['Close']) and not pd.isna(latest['MA20']) and latest['Close'] > latest['MA20']:
+                    score += 10
+                    signals.append(("Price above MA20", "bullish"))
+                elif not pd.isna(latest['Close']) and not pd.isna(latest['MA20']):
+                    score -= 10
+                    signals.append(("Price below MA20", "bearish"))
+                
+                if not pd.isna(latest['MA20']) and not pd.isna(latest['MA50']) and latest['MA20'] > latest['MA50']:
+                    score += 5
+                    signals.append(("MA20 above MA50", "bullish"))
+                elif not pd.isna(latest['MA20']) and not pd.isna(latest['MA50']):
+                    score -= 5
+                    signals.append(("MA20 below MA50", "bearish"))
+                
+                rsi = float(latest['RSI']) if not pd.isna(latest['RSI']) else 50
+                if 40 <= rsi <= 60:
+                    score += 15
+                    signals.append((f"RSI neutral ({rsi:.1f})", "neutral"))
+                elif rsi > 70:
+                    score -= 10
+                    signals.append((f"RSI overbought ({rsi:.1f})", "bearish"))
+                elif rsi < 30:
+                    score += 10
+                    signals.append((f"RSI oversold ({rsi:.1f})", "bullish"))
+                
+                if not pd.isna(latest['MACD']) and not pd.isna(latest['MACD_Signal']) and latest['MACD'] > latest['MACD_Signal']:
+                    score += 10
+                    signals.append(("MACD bullish crossover", "bullish"))
+                elif not pd.isna(latest['MACD']) and not pd.isna(latest['MACD_Signal']):
+                    score -= 5
+                    signals.append(("MACD bearish", "bearish"))
+                
+                if direction == 'UP':
+                    score += 15
+                    signals.append((f"Forecast predicts {direction}", "bullish"))
+                else:
+                    score -= 10
+                    signals.append((f"Forecast predicts {direction}", "bearish"))
+                
+                if volatility < 20:
+                    score += 5
+                    signals.append((f"Low volatility ({volatility:.1f}%)", "bullish"))
+                elif volatility > 35:
+                    score -= 5
+                    signals.append((f"High volatility ({volatility:.1f}%)", "bearish"))
+                    
             except Exception as e:
                 logger.warning(f"Signal calculation error: {e}")
                 signals.append(("Analysis complete", "neutral"))
@@ -731,12 +1081,15 @@ def diagnostic():
     return jsonify(results)
 
 # Configure Gemini
-# Ideally this should be in an env var, but for now we'll check if it's set or use a placeholder
-GOOGLE_API_KEY = os.getenv(' enter api key ')
-if GOOGLE_API_KEY:
+# API key is hardcoded here - for production, use environment variables instead
+GOOGLE_API_KEY = 'AIzaSyDpF68K3OZzxuvDXP-TGCzbb2WwoQd3J18'
+if GEMINI_AVAILABLE and GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
+    logger.info("✓ Gemini API configured successfully")
+elif not GEMINI_AVAILABLE:
+    logger.warning("google-generativeai library not installed. Portfolio analysis will be disabled.")
 else:
-    logger.warning("GOOGLE_API_KEY not found in environment variables. Portfolio analysis will fail.")
+    logger.warning("GOOGLE_API_KEY not found. Portfolio analysis will fail.")
 
 @app.route('/api/analyze_portfolio', methods=['POST'])
 def analyze_portfolio():
@@ -852,11 +1205,7 @@ def list_gemini_models():
 # ADK INTEGRATION (Merged)
 # ============================================================================
 
-try:
-    import google.generativeai as genai
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
+# genai is already imported at the top of the file
 
 @dataclass
 class ADKTool:
@@ -1046,18 +1395,144 @@ class FinSightADKAgent:
     def get_trace(self): return self.observability.get_trace()
     def get_memory(self, sid): return self.memory_manager.get_or_create(sid)
 
+
+
+# ============================================================================
+# ADK AGENT IMPLEMENTATION
+# ============================================================================
+
+class ADKObservability:
+    def __init__(self):
+        self.trace = []
+    
+    def log_event(self, component, name, status, inputs, outputs):
+        event = {
+            "step": len(self.trace) + 1,
+            "component": component,
+            "name": name,
+            "status": status,
+            "inputs": inputs,
+            "outputs": outputs,
+            "timestamp": time.time()
+        }
+        self.trace.append(event)
+        logger.info(f"[{component.upper()}] {name}: {status}")
+        return event
+
+class ADKMemoryManager:
+    def __init__(self):
+        self.sessions = {}
+    
+    def get_memory(self, session_id):
+        if session_id not in self.sessions:
+            self.sessions[session_id] = ADKSessionMemory(session_id)
+        return self.sessions[session_id]
+
+class ADKSessionMemory:
+    def __init__(self, session_id):
+        self.session_id = session_id
+        self.short_term = []
+        self.summary = ""
+    
+    def add_interaction(self, user_query, agent_response):
+        self.short_term.append({
+            "timestamp": time.time(),
+            "query": user_query,
+            "response": agent_response
+        })
+        if len(self.short_term) > 10:
+            self.short_term.pop(0)
+            
+    def get_context(self):
+        return [item['query'] for item in self.short_term[-3:]]
+
+class OrcaADKAgent:
+    def __init__(self, stock_analyzer, llm_orchestrator):
+        self.stock_analyzer = stock_analyzer
+        self.llm_orchestrator = llm_orchestrator
+        self.observability = ADKObservability()
+        self.memory_manager = ADKMemoryManager()
+        self.tools = self._register_tools()
+        
+    def _register_tools(self):
+        return {
+            "fetch_price_data": {
+                "description": "Fetch historical OHLCV data",
+                "parameters": {"symbol": "str"}
+            },
+            "compute_indicators": {
+                "description": "Calculate technical indicators (RSI, MACD, etc.)",
+                "parameters": {"data": "DataFrame"}
+            },
+            "run_forecast": {
+                "description": "Run ML price forecast",
+                "parameters": {"data": "DataFrame", "horizon": "int"}
+            },
+            "quantum_risk": {
+                "description": "Calculate quantum-inspired risk metrics",
+                "parameters": {"volatility": "float"}
+            }
+        }
+        
+    def get_tool_schemas(self):
+        return self.tools
+        
+    def get_trace(self):
+        return self.observability.trace
+        
+    def get_memory(self, session_id):
+        return self.memory_manager.get_memory(session_id)
+        
+    def execute(self, session_id, symbol, question, horizon_days=30):
+        self.observability.log_event("agent", "start_execution", "processing", {"symbol": symbol, "question": question}, {})
+        
+        # 1. SCAN: Fetch Data & Indicators
+        try:
+            hist, source = self.stock_analyzer.fetch_data(symbol)
+            if hist is None or hist.empty:
+                raise Exception(f"Failed to fetch data for {symbol}")
+                
+            self.observability.log_event("tool", "fetch_price_data", "ok", {"symbol": symbol}, {"rows": len(hist), "source": source})
+            
+            analysis = self.stock_analyzer.analyze(symbol)
+            self.observability.log_event("tool", "compute_indicators", "ok", {}, {"indicators": list(analysis['metrics'].keys())})
+            self.observability.log_event("tool", "run_forecast", "ok", {"horizon": horizon_days}, analysis['forecast'])
+            
+        except Exception as e:
+            self.observability.log_event("agent", "execution_failed", "error", {"error": str(e)}, {})
+            raise e
+            
+        # 2. THINK: Multi-Model Consensus
+        model_ids = ['mistral', 'llama3', 'phi3'] # Default set
+        consensus = self.llm_orchestrator.get_evaluated_responses(analysis, model_ids, question)
+        self.observability.log_event("model", "multi_llm_consensus", "ok", {"models": model_ids}, {"count": consensus.get('count', 0)})
+        
+        # 3. OBSERVE: Update Memory
+        memory = self.get_memory(session_id)
+        best_response = consensus.get('best_response', {}).get('response', 'No consensus reached')
+        memory.add_interaction(question, best_response)
+        
+        self.observability.log_event("agent", "complete", "success", {}, {"best_model": consensus.get('best_model')})
+        
+        return {
+            "analysis": analysis,
+            "llm_responses": consensus,
+            "adk_trace": self.observability.trace,
+            "session_id": session_id
+        }
+
 class ADKFlaskWrapper:
     def __init__(self, app, stock_analyzer, llm_orchestrator):
-        self.app, self.stock_analyzer, self.llm_orchestrator = app, stock_analyzer, llm_orchestrator
-        self.adk_agent = FinSightADKAgent(stock_analyzer, llm_orchestrator, os.environ.get('GOOGLE_API_KEY'))
-        self._register_routes()
-        print("\n" + "="*60)
-        print("ADK INTEGRATED - GLASS BOX MODE ACTIVE")
-        print("="*60)
-    
-    def _register_routes(self):
-        @self.app.route('/api/adk/analyze/<symbol>', methods=['GET', 'POST'])
-        def adk_analyze(symbol):
+        self.app = app
+        self.stock_analyzer = stock_analyzer
+        self.llm_orchestrator = llm_orchestrator
+        self.adk_agent = OrcaADKAgent(stock_analyzer, llm_orchestrator)
+        self.register_routes()
+        
+    def register_routes(self):
+        @self.app.route('/api/adk/analyze')
+        def adk_analyze():
+            symbol = request.args.get('symbol', 'AAPL')
             try:
                 result = self.adk_agent.execute(request.args.get('session_id', 'default'), symbol.upper(), request.args.get('question', 'Analyze'), int(request.args.get('horizon_days', 30)))
                 return jsonify({**result['analysis'], 'adk_trace': result['adk_trace'], 'adk_enabled': True, 'session_id': result['session_id']})
