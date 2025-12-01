@@ -1,0 +1,9 @@
+flask
+pandas
+numpy
+requests
+yfinance
+google-generativeai
+statsmodels
+gunicorn
+Pillow
