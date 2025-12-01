@@ -13,7 +13,7 @@ import time
 from datetime import datetime, timedelta
 import warnings
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import Dict, Any, Callable, List, Optional
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
