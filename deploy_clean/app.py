@@ -33,7 +33,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Configure Gemini API Key
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', 'AIzaSyDpF68K3OZzxuvDXP-TGCzbb2WwoQd3J18')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 if GEMINI_AVAILABLE and GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
     logger.info("✓ Gemini API configured successfully")

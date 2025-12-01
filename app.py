@@ -1082,7 +1082,7 @@ def diagnostic():
 
 # Configure Gemini
 # API key is hardcoded here - for production, use environment variables instead
-GOOGLE_API_KEY = 'AIzaSyDpF68K3OZzxuvDXP-TGCzbb2WwoQd3J18'
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 if GEMINI_AVAILABLE and GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
     logger.info("✓ Gemini API configured successfully")
