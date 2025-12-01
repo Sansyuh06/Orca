@@ -1,20 +1,20 @@
-# Orca: Web Edition (Gemini Powered) ☁️
+# Orca: Web Edition (Gemini Powered) 
 
 **Google 5-Day AI Agents Intensive – Capstone Project**
 **Track:** Concierge Agents (Cloud Deployment Version)
 
-## 🌊 Overview
+##  Overview
 
 This is the **Cloud/Web Version** of Orca. Unlike the standard version which uses local LLMs (Ollama), this version is powered entirely by **Google Gemini 1.5 Pro & Flash**.
 
 **Why this version?**
-- 🚀 **Deploy Anywhere**: Runs on Cloud Run, Hugging Face, Render, or any CPU-only server.
-- ⚡ **No GPU Needed**: All heavy lifting is done by the Gemini API.
-- 🧠 **Simulated Experts**: The "Panel of Experts" (Mistral, Llama, Phi) are simulated using Gemini with specific system instructions/personas.
+-  **Deploy Anywhere**: Runs on Cloud Run, Hugging Face, Render, or any CPU-only server.
+-  **No GPU Needed**: All heavy lifting is done by the Gemini API.
+-  **Simulated Experts**: The "Panel of Experts" (Mistral, Llama, Phi) are simulated using Gemini with specific system instructions/personas.
 
 ---
 
-## 🛠️ Setup & Installation
+##  Setup & Installation
 
 ### Prerequisites
 - Python 3.8+
@@ -51,9 +51,9 @@ Access the dashboard at `http://localhost:5000`
 
 ---
 
-## ☁️ Deployment
+##  Deployment
 
-### Deploy to Google Cloud Run (Bonus Points! 🏆)
+### Deploy to Google Cloud Run (Bonus Points! )
 
 1. **Install Google Cloud SDK**
 2. **Deploy**:

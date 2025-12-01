@@ -4,7 +4,7 @@ Since Orca relies on **local LLMs (Ollama)** and **GPU acceleration**, deploying
 
 ---
 
-## Option 1: The "Demo" Deployment (Ngrok) 🚀
+## Option 1: The "Demo" Deployment (Ngrok) 
 **Best for:** Recording your demo video, sharing with friends temporarily.
 **Cost:** Free
 **Difficulty:** Easy
@@ -26,7 +26,7 @@ This method keeps the app running on your powerful local machine but creates a s
 
 ---
 
-## Option 2: The "Cloud" Deployment (Google Cloud Run) ☁️
+## Option 2: The "Cloud" Deployment (Google Cloud Run) 
 **Best for:** Earning the "Agent Deployment" bonus points (5 pts).
 **Cost:** Free Tier (mostly)
 **Difficulty:** Advanced (Requires Code Changes)
@@ -57,7 +57,7 @@ CMD ["python", "app.py"]
 
 ---
 
-## Option 3: The "Power" Deployment (GPU VM) ⚡
+## Option 3: The "Power" Deployment (GPU VM) 
 **Best for:** A permanent, fully functional clone of your local setup.
 **Cost:** ~$0.50/hour
 **Difficulty:** Medium
@@ -82,7 +82,7 @@ Rent a virtual machine with a GPU (e.g., NVIDIA T4).
 
 ---
 
-## Option 4: The "AI Community" Way (Hugging Face Spaces) 🤗
+## Option 4: The "AI Community" Way (Hugging Face Spaces) 
 **Best for:** Public portfolio, easy sharing, "Agent Deployment" bonus.
 **Cost:** Free (CPU) or Paid (GPU)
 **Difficulty:** Medium
@@ -100,7 +100,7 @@ Like Cloud Run, the **Free Tier is CPU-only**. You must use the **Gemini API fal
 
 ---
 
-## Option 5: The "Home Network" Way (LAN) 🏠
+## Option 5: The "Home Network" Way (LAN) 
 **Best for:** Showing family/colleagues in the same office/house.
 **Cost:** Free
 **Difficulty:** Very Easy

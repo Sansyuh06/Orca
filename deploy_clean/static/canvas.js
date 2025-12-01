@@ -963,7 +963,7 @@ const QuantumTradingCanvas = ({ currentAnalysis, onClose }) => {
                                                 return (
                                                     <div key={entry.id} onClick={() => showModelResponse(entry.id)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 4px', gap: '8px', cursor: 'pointer', opacity: isLowest && sortedScores.length > 1 ? 0.7 : 1 }}>
                                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                            <div style={{ fontSize: '13px', color: scoreColor, fontWeight: isHighest ? 800 : 600 }}>{getModelLabel(entry.id)}{isHighest ? ' 🏆' : ''}{isLowest && sortedScores.length > 1 ? ' ⚠️' : ''}</div>
+                                                            <div style={{ fontSize: '13px', color: scoreColor, fontWeight: isHighest ? 800 : 600 }}>{getModelLabel(entry.id)}{isHighest ? ' ' : ''}{isLowest && sortedScores.length > 1 ? ' ' : ''}</div>
                                                             <div style={{ fontSize: '11px', color: '#9ca3af' }}>{entry.id}</div>
                                                         </div>
                                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>

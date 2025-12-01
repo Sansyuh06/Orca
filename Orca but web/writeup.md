@@ -4,7 +4,7 @@
 
 ---
 
-## 🎯 Problem Statement: The Information Crisis
+##  Problem Statement: The Information Crisis
 
 Retail investors today face a **crisis of information overload**. The democratization of financial data means that anyone with an internet connection has access to the same raw information as Wall Street professionals: real-time price charts, SEC filings, earnings reports, analyst ratings, and 24/7 news feeds. Yet paradoxically, this abundance of data has created a new barrier to entry.
 
@@ -26,7 +26,7 @@ This gap leads to poor investment decisions. Studies show that retail investors 
 
 ---
 
-## 🤖 Why Agents? Why This Problem Demands an Agentic Solution
+##  Why Agents? Why This Problem Demands an Agentic Solution
 
 Traditional software is fundamentally **static and reactive**. A conventional stock analysis app displays data when you request it, but it doesn't *understand* what it's showing you. It can't adapt its analysis based on market conditions, and it certainly can't explain its reasoning.
 
@@ -65,7 +65,7 @@ This "Glass Box" transparency is critical for adoption and regulatory compliance
 
 ---
 
-## 🛠️ What I Created: The Orca Architecture
+##  What I Created: The Orca Architecture
 
 I built **Orca**, an autonomous AI Quantitative Analyst that doesn't just analyze stocks—it *investigates* them like a professional analyst would.
 
@@ -79,36 +79,36 @@ User Query: "Should I buy AAPL?"
    Think-Act-Observe Loop Controller    
 
          ↓
-    ┌───────────┐
-    │  THINK    │ Analyze query, determine strategy
-    └───────────┘
+    
+      THINK     Analyze query, determine strategy
+    
          ↓
-    ┌───────────┐
-    │   ACT     │ Execute tools in parallel:
-    └───────────┘ fetch_price_data()
+    
+       ACT      Execute tools in parallel:
+     fetch_price_data()
                     compute_indicators()
                     run_forecast()
                     quantum_risk()
          ↓
-    ┌───────────┐
-    │ OBSERVE   │ Collect results, update memory
-    └───────────┘
+    
+     OBSERVE    Collect results, update memory
+    
          ↓
 
      PANEL OF EXPERTS (Multi-LLM)        
                                          
-      ┌───────────┐ ┌───────────┐ ┌───────────┐ 
-      │  Mistral  │ │  Llama 3  │ │  Phi-3  │ 
-      │ "Balanced │ │ "Deep     │ │"Concise"│ 
-      │  Analyst" │ │  Analysis"│ │         │ 
-      └───────────┘ └───────────┘ └───────────┘ 
+         
+        Mistral     Llama 3     Phi-3   
+       "Balanced   "Deep      "Concise" 
+        Analyst"    Analysis"           
+         
                                     
             ↓             ↓             ↓
                                       
-                     ┌───────────┐
-                     │JUDGE MODEL│            
-                     │(DeepSeek) │          
-                     └───────────┘          
+                     
+                     JUDGE MODEL            
+                     (DeepSeek)           
+                               
                     Scores each             
                     response 1-10           
                     on:                     
@@ -119,11 +119,11 @@ User Query: "Should I buy AAPL?"
                      • Actionability         
                      
                           ↓
-                     ┌───────────┐
-                     │   BEST    │
-                     │ RESPONSE  │
-                     │(Score: 9) │ 
-                     └───────────┘
+                     
+                        BEST    
+                      RESPONSE  
+                     (Score: 9)  
+                     
 ```
 
 ### Key Innovations:
@@ -239,7 +239,7 @@ This enables natural follow-up questions:
 
 ---
 
-## ✨ Bonus: Gemini Integration (Portfolio Analysis)
+##  Bonus: Gemini Integration (Portfolio Analysis)
 
 I integrated **Google Gemini 1.5 Pro** to add a powerful multimodal capability: **Portfolio Analysis**.
 
@@ -252,7 +252,7 @@ This demonstrates the power of combining specialized local agents (for stock ana
 
 ---
 
-## 📈 Demo: How It Works in Practice
+##  Demo: How It Works in Practice
 
 ### Scenario: Analyzing Apple (AAPL)
 
@@ -324,7 +324,7 @@ The user sees:
 
 ---
 
-## 🏗️ The Build: Technical Implementation Details
+##  The Build: Technical Implementation Details
 
 ### Technology Stack
 
@@ -431,7 +431,7 @@ def _register_tools(self):
 
 ---
 
-## 🚀 Future Enhancements
+##  Future Enhancements
 
 ### 1. Live Trading Integration
 **Goal**: Allow the agent to execute paper trades based on its analysis.
@@ -447,7 +447,7 @@ def _register_tools(self):
 
 ---
 
-## 🏁 Conclusion
+##  Conclusion
 
 Orca demonstrates that **agents are not just chatbots with tools**—they are autonomous systems capable of complex, multi-step reasoning that adapts to context. By combining:
 

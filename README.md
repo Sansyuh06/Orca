@@ -3,7 +3,7 @@
 **Google 5-Day AI Agents Intensive – Capstone Project**
 **Track:** Concierge Agents
 
-## 🌊 Overview
+##  Overview
 
 Orca is an intelligent, autonomous stock analysis agent that acts as your **personal quantitative analyst**. Unlike traditional static dashboards, Orca actively *investigates* stocks for you, combining quantitative finance with cutting-edge multi-LLM reasoning to deliver institutional-grade insights in plain English.
 
@@ -12,7 +12,7 @@ Retail investors face an information crisis: too much data, too little time. Orc
 
 ---
 
-## 🚀 Key Features (Competition Criteria)
+##  Key Features (Competition Criteria)
 
 Orca demonstrates the power of agentic AI by implementing **3 Key Concepts** from the course:
 
@@ -33,12 +33,12 @@ Orca provides full transparency into its decision-making:
 - **AI Canvas**: A visual, interactive graph showing the agent's "Think-Act-Observe" loop in real-time.
 - **Execution Traces**: Detailed logs of every tool call, model input, and judge score.
 
-### ✨ Bonus: Gemini Integration
+###  Bonus: Gemini Integration
 Orca leverages **Google Gemini 1.5 Pro** for its **Portfolio Analysis** feature. Users can upload PDF statements or images of their portfolio, and Gemini's multimodal capabilities analyze the holdings to provide personalized rebalancing advice.
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 Orca follows the **Model + Tools + Orchestration** pattern:
 
@@ -51,12 +51,12 @@ graph TD
     Tools -->|Calc| Math[Technical Indicators]
     Tools -->|Predict| ML[ARIMA Forecast]
     Orchestrator -->|Observe| Context[Update Memory]
-    Context -->|Parallel| Experts[Panel of Experts (Mistral/Llama/Phi)]
+    Context -->|Parallel| Experts["Panel of Experts (Mistral/Llama/Phi)"]
     Experts -->|Evaluate| Judge[Judge Agent (DeepSeek)]
     Judge -->|Result| UI[Dashboard & Canvas]
 ```
 
-## 🛠️ Installation & Setup
+##  Installation & Setup
 
 ### Prerequisites
 - Python 3.8+
@@ -90,7 +90,7 @@ graph TD
 
 ---
 
-## 📚 Documentation
+##  Documentation
 
 - **[Writeup](writeup.md)**: Detailed project explanation for Kaggle.
 - **[Notebook](finsight_x_capstone.ipynb)**: Deep dive into the code and agent logic.

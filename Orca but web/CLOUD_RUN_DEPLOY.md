@@ -1,4 +1,4 @@
-# ☁️ Deploying Orca to Google Cloud Run
+#  Deploying Orca to Google Cloud Run
 
 Follow these exact steps to deploy your app and get the **5 Bonus Points**!
 
@@ -35,7 +35,7 @@ gcloud run deploy orca-web \
 The command will finish and show a URL like:
 `https://orca-web-xyz123-uc.a.run.app`
 
-Click it, and your app is live! 🚀
+Click it, and your app is live! 
 
 ---
 

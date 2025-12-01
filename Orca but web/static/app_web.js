@@ -17,7 +17,7 @@ let isRealtimeActive = false;
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Application starting...'); // Fingers crossed
+    console.log(' Application starting...'); // Fingers crossed
 
     try {
         // Load initial data in parallel to speed things up
@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadModels();
         checkLLMStatus();
         setupEventListeners();
-        console.log('✓ Application initialized');
+        console.log(' Application initialized');
     } catch (error) {
-        console.error('✗ Initialization error:', error);
+        console.error(' Initialization error:', error);
         showError('Failed to initialize application: ' + error.message);
     }
 });
@@ -51,9 +51,9 @@ async function loadStocks() {
             select.appendChild(option);
         });
 
-        console.log('✓ Stocks loaded');
+        console.log(' Stocks loaded');
     } catch (error) {
-        console.error('✗ Error loading stocks:', error);
+        console.error(' Error loading stocks:', error);
     }
 }
 
@@ -69,10 +69,10 @@ async function loadModels() {
         if (data.generators) {
             availableModels = data.generators;
             renderModelList(data.generators);
-            console.log('✓ AI models loaded');
+            console.log(' AI models loaded');
         }
     } catch (error) {
-        console.error('✗ Error loading models:', error);
+        console.error(' Error loading models:', error);
     }
 }
 
@@ -141,13 +141,13 @@ async function checkLLMStatus() {
         const statusEl = document.getElementById('ai-status');
         if (statusEl) {
             if (data.available) {
-                statusEl.innerHTML = '<span style="color: var(--success);">✓ AI Online</span>';
+                statusEl.innerHTML = '<span style="color: var(--success);"> AI Online</span>';
             } else {
                 statusEl.innerHTML = '<span style="color: var(--warning);">AI Offline</span>';
             }
         }
     } catch (error) {
-        console.error('✗ LLM status check failed:', error);
+        console.error(' LLM status check failed:', error);
     }
 }
 
@@ -220,24 +220,24 @@ async function handleAnalyze() {
     }
 
     try {
-        console.log(`📊 Analyzing ${symbol}...`);
+        console.log(` Analyzing ${symbol}...`);
         const response = await fetch(`/api/analyze/${symbol}`);
         const data = await response.json();
 
         if (data.error) {
-            console.error('✗ Analysis error:', data.error);
+            console.error(' Analysis error:', data.error);
             showError(data.error);
             return;
         }
 
-        console.log('✓ Analysis complete:', data.recommendation);
+        console.log(' Analysis complete:', data.recommendation);
 
         // Check if real data was used
         if (data.data_source === 'real_market_data') {
-            console.log(`✓ Using REAL market data (${data.data_points} points)`);
-            console.log(`✓ Date range: ${data.date_range}`);
+            console.log(` Using REAL market data (${data.data_points} points)`);
+            console.log(` Date range: ${data.date_range}`);
         } else {
-            console.warn('⚠ Real data not available');
+            console.warn(' Real data not available');
         }
 
         currentAnalysis = data;
@@ -255,7 +255,7 @@ async function handleAnalyze() {
         showSuccess(`Real-time updates activated for ${symbol}`);
 
     } catch (error) {
-        console.error('✗ Analysis error:', error);
+        console.error(' Analysis error:', error);
         showError('Analysis failed: ' + error.message);
     } finally {
         if (analyzeBtn) {
@@ -270,7 +270,7 @@ async function handleAnalyze() {
 // ============================================================================
 
 function displayAnalysis(data) {
-    console.log('📈 Displaying analysis results...');
+    console.log(' Displaying analysis results...');
 
     const emptyState = document.getElementById('empty-state');
     if (emptyState) emptyState.classList.add('hidden');
@@ -326,7 +326,7 @@ function displayAnalysis(data) {
     updateNews(data.news);
     updateChart(data.chart_data, data.symbol);
 
-    console.log('✓ Display complete');
+    console.log(' Display complete');
 }
 
 function updateForecast(forecast) {
@@ -540,7 +540,7 @@ function updateChart(chartData, symbol) {
         }
     });
 
-    console.log('✓ Chart updated');
+    console.log(' Chart updated');
 }
 
 // ============================================================================
@@ -553,7 +553,7 @@ function startRealtimeUpdates() {
 
     if (!currentSymbol) return;
 
-    console.log('🔴 Starting real-time updates for', currentSymbol);
+    console.log(' Starting real-time updates for', currentSymbol);
     isRealtimeActive = true;
 
     // Show streaming indicator
@@ -581,7 +581,7 @@ function stopRealtimeUpdates() {
         indicator.classList.remove('active');
     }
 
-    console.log('⏹ Real-time updates stopped');
+    console.log(' Real-time updates stopped');
 }
 
 async function updateRealtimePrice() {
@@ -669,10 +669,10 @@ async function updateRealtimePrice() {
         // Note: 'none' mode is crucial here for performance, otherwise it lags on updates
         priceChart.update('none');
 
-        console.log(`📊 Updated: ${currentSymbol} = $${newPrice.toFixed(2)}`);
+        console.log(` Updated: ${currentSymbol} = $${newPrice.toFixed(2)}`);
 
     } catch (error) {
-        console.error('✗ Real-time update error:', error);
+        console.error(' Real-time update error:', error);
     }
 }
 
@@ -704,7 +704,7 @@ async function handleConsensus() {
     }
 
     try {
-        console.log('🤖 Getting AI consensus...');
+        console.log(' Getting AI consensus...');
         const response = await fetch('/api/llm/consensus', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -720,11 +720,11 @@ async function handleConsensus() {
             showError(data.error);
         } else {
             displayConsensusResults(data);
-            console.log('✓ AI consensus received');
+            console.log(' AI consensus received');
         }
 
     } catch (error) {
-        console.error('✗ Consensus error:', error);
+        console.error(' Consensus error:', error);
         showError('AI Consensus failed: ' + error.message);
     } finally {
         if (btn) {
@@ -793,7 +793,7 @@ async function handlePortfolioAnalyze() {
             formData.append('files', files[i]);
         }
 
-        console.log('📂 Uploading portfolio documents...');
+        console.log(' Uploading portfolio documents...');
         const response = await fetch('/api/analyze_portfolio', {
             method: 'POST',
             body: formData
@@ -804,7 +804,7 @@ async function handlePortfolioAnalyze() {
         if (data.error) {
             showError(data.error);
         } else {
-            console.log('✓ Portfolio analysis complete');
+            console.log(' Portfolio analysis complete');
             if (contentEl) {
                 // Simple markdown rendering (bold, headers, lists)
                 let text = data.analysis;
@@ -825,7 +825,7 @@ async function handlePortfolioAnalyze() {
         }
 
     } catch (error) {
-        console.error('✗ Portfolio analysis error:', error);
+        console.error(' Portfolio analysis error:', error);
         showError('Portfolio analysis failed: ' + error.message);
     } finally {
         if (btn) {
@@ -841,7 +841,7 @@ async function handlePortfolioAnalyze() {
 // ============================================================================
 
 function showError(message) {
-    console.error('❌ Error:', message);
+    console.error(' Error:', message);
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed;
@@ -868,7 +868,7 @@ function showError(message) {
 }
 
 function showSuccess(message) {
-    console.log('✅ Success:', message);
+    console.log(' Success:', message);
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed;
@@ -894,4 +894,4 @@ function showSuccess(message) {
     }, 3000);
 }
 
-console.log('✓ App.js loaded with real-time features');
+console.log(' App.js loaded with real-time features');

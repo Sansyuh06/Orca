@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 if GEMINI_AVAILABLE and GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
-    logger.info("✓ Gemini API configured successfully")
+    logger.info(" Gemini API configured successfully")
 elif not GEMINI_AVAILABLE:
     logger.warning("google-generativeai library not installed. Portfolio analysis will be disabled.")
 else:
@@ -108,7 +108,7 @@ class StockAnalyzer:
                 }, index=pd.to_datetime(timestamps, unit='s'))
                 
                 df = df.dropna()
-                logger.info(f"✓ Yahoo Direct: Fetched {len(df)} rows")
+                logger.info(f" Yahoo Direct: Fetched {len(df)} rows")
                 return df
             else:
                 logger.warning(f"Yahoo Direct failed: {response.status_code}")
@@ -127,7 +127,7 @@ class StockAnalyzer:
             df = ticker.history(period="1y")
             
             if not df.empty:
-                logger.info(f"✓ yfinance: Fetched {len(df)} rows")
+                logger.info(f" yfinance: Fetched {len(df)} rows")
                 return df
             return None
         except Exception as e:
@@ -165,7 +165,7 @@ class StockAnalyzer:
                         "5. volume": "Volume"
                     })
                     df = df.sort_index()
-                    logger.info(f"✓ Alpha Vantage: Fetched {len(df)} rows")
+                    logger.info(f" Alpha Vantage: Fetched {len(df)} rows")
                     return df
             return None
         except Exception as e:
@@ -216,7 +216,7 @@ class StockAnalyzer:
             })
         
         df = pd.DataFrame(data, index=dates)
-        logger.info(f"✓ Generated {len(df)} synthetic data points")
+        logger.info(f" Generated {len(df)} synthetic data points")
         return df
     
     def fetch_data(self, symbol):
@@ -230,7 +230,7 @@ class StockAnalyzer:
         if cache_key in self.data_cache:
             cached_data, cached_time = self.data_cache[cache_key]
             if time.time() - cached_time < self.cache_timeout:
-                logger.info(f"✓ Using cached data for {symbol}")
+                logger.info(f" Using cached data for {symbol}")
                 return cached_data, 'cache'
         
         # Try methods in order
@@ -247,7 +247,7 @@ class StockAnalyzer:
                 hist = method_func()
                 
                 if hist is not None and not hist.empty and len(hist) >= 20:
-                    logger.info(f"✓ SUCCESS: {method_name} returned {len(hist)} data points")
+                    logger.info(f" SUCCESS: {method_name} returned {len(hist)} data points")
                     
                     # Cache the result
                     self.data_cache[cache_key] = (hist, time.time())
@@ -378,7 +378,7 @@ class StockAnalyzer:
                 logger.error(f"ERROR: {error_msg}")
                 return {'error': error_msg, 'symbol': symbol}
             
-            logger.info(f"✓ Using data source: {data_source} ({len(hist)} points)")
+            logger.info(f" Using data source: {data_source} ({len(hist)} points)")
             
             # Ensure required columns exist
             required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
@@ -590,8 +590,8 @@ class StockAnalyzer:
                 'date_range': f"{hist.index[0].strftime('%Y-%m-%d')} to {hist.index[-1].strftime('%Y-%m-%d')}"
             }
             
-            logger.info(f"✓ Analysis complete: {recommendation} (Score: {score})")
-            logger.info(f"✓ Data source: {data_source.upper()} ({len(hist)} points)")
+            logger.info(f" Analysis complete: {recommendation} (Score: {score})")
+            logger.info(f" Data source: {data_source.upper()} ({len(hist)} points)")
             return result
             
         except Exception as e:
@@ -848,17 +848,17 @@ def analyze_stock(symbol):
         result = analyzer.analyze(symbol.upper())
         
         if result and 'error' in result:
-            logger.error(f"✗ Analysis error: {result['error']}")
+            logger.error(f" Analysis error: {result['error']}")
             return jsonify(result), 400
         elif result:
-            logger.info(f"✓ Returning successful analysis")
+            logger.info(f" Returning successful analysis")
             return jsonify(result)
         else:
-            logger.error(f"✗ Analysis returned None")
+            logger.error(f" Analysis returned None")
             return jsonify({'error': 'Analysis failed - no data returned'}), 400
             
     except Exception as e:
-        logger.error(f"✗ Exception in analyze_stock: {e}")
+        logger.error(f" Exception in analyze_stock: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': f'Server error: {str(e)}'}), 500
