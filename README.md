@@ -52,7 +52,7 @@ graph TD
     Tools -->|Predict| ML[ARIMA Forecast]
     Orchestrator -->|Observe| Context[Update Memory]
     Context -->|Parallel| Experts["Panel of Experts (Mistral/Llama/Phi)"]
-    Experts -->|Evaluate| Judge[Judge Agent (DeepSeek)]
+    Experts -->|Evaluate| Judge["Judge Agent (DeepSeek)"]
     Judge -->|Result| UI[Dashboard & Canvas]
 ```
 
